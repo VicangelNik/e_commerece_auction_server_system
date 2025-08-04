@@ -7,13 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vicangel.e_commerce_auction_server_system.core.api.UserService;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.api.UserOpenAPI;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.ItemCategoryResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveUserRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.UserResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.mappers.UserEndpointMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +33,7 @@ final class UserController implements UserOpenAPI {
 
   @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<Long> addUser(@Valid @RequestBody final UserRequest request) {
+  public ResponseEntity<Long> addUser(@Valid @RequestBody final SaveUserRequest request) {
 
     final long result = service.insertUser(mapper.mapRequestToModel(request));
 
@@ -44,9 +46,9 @@ final class UserController implements UserOpenAPI {
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<ItemCategoryResponse> findById(@PathVariable final long id) {
+  public ResponseEntity<UserResponse> findById(@PathVariable final long id) {
 
-    ItemCategoryResponse response = service.findById(id).map(mapper::mapModelToResponse)
+    UserResponse response = service.findById(id).map(mapper::mapModelToResponse)
       .orElseThrow(() -> new IllegalArgumentException("Not Found"));
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -56,17 +58,17 @@ final class UserController implements UserOpenAPI {
   @Override
   public ResponseEntity<List<UserResponse>> findAll() {
 
-    List<ItemCategoryResponse> response = service.findAll().stream().map(mapper::mapModelToResponse).toList();
+    List<UserResponse> response = service.findAll().stream().map(mapper::mapModelToResponse).toList();
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  @PutMapping(value = "/update/{id}", consumes = APPLICATION_JSON_VALUE)
-  @Override
-  public ResponseEntity<Void> updateUser(@PathVariable final long id) {
-
-    List<ItemCategoryResponse> response = service.updateUser(id);
-
-    return ResponseEntity.status(HttpStatus.OK).body(response);
-  }
+//  @PutMapping(value = "/update/{id}", consumes = APPLICATION_JSON_VALUE)
+//  @Override
+//  public ResponseEntity<Void> updateUser(@PathVariable final long id) {
+//
+//    service.updateUser(id);
+//
+//    return ResponseEntity.status(HttpStatus.OK).body(response);
+//  }
 }

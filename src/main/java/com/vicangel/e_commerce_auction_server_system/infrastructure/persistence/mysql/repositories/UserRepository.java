@@ -1,0 +1,18 @@
+package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories;
+
+import java.util.List;
+import java.util.Optional;
+
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.UserEntity;
+
+public interface UserRepository {
+
+  /**
+   * @return the id of the inserted user
+   */
+  long insertUser(UserEntity entity);
+
+  Optional<UserEntity> findById(long id);
+
+  List<UserEntity> findAll();
+}
