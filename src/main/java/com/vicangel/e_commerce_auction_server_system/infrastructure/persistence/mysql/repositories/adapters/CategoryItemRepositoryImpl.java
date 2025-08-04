@@ -58,9 +58,6 @@ public class CategoryItemRepositoryImpl implements CategoryItemRepository {
 
   @Override
   public List<ItemCategoryEntity> findAll() {
-    return jdbcTemplate.query(
-      findAllSQL,
-      new BeanPropertyRowMapper<>(ItemCategoryEntity.class)
-    );
+    return jdbcTemplate.queryForList(findAllSQL, ItemCategoryEntity.class);
   }
 }

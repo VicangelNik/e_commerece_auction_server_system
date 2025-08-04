@@ -5,7 +5,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
 
 import com.vicangel.e_commerce_auction_server_system.core.model.Auction;
+import com.vicangel.e_commerce_auction_server_system.core.model.AuctionItem;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.AuctionItemDTO;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveAuctionRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.AuctionResponse;
 
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface AuctionEndpointMapper {
@@ -15,4 +18,8 @@ public interface AuctionEndpointMapper {
   @Mapping(target = "started", ignore = true)
   @Mapping(target = "currently", ignore = true)
   Auction mapRequestToModel(SaveAuctionRequest request);
+
+  AuctionResponse mapModelToResponse(Auction model);
+
+  AuctionItem mapAuctionRequestToModel(AuctionItemDTO request);
 }

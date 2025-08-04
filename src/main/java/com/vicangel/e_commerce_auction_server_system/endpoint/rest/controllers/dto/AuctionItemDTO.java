@@ -1,4 +1,4 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto;
 
 import java.util.Set;
 
@@ -10,5 +10,6 @@ public record AuctionItemDTO(Long id,
                              Double latitude,
                              Double longitude,
                              String country,
-                             Set<Long> categories) {
+                             Set<Long> categories,
+                             ItemImageDTO image) {
 }

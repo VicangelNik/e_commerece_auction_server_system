@@ -13,5 +13,5 @@ public interface ItemCategoryOpenAPI {
 
   ResponseEntity<ItemCategoryResponse> findById(long id);
 
-  ResponseEntity<List<ItemCategoryResponse>> getAllAuctions();
+  ResponseEntity<List<ItemCategoryResponse>> findAll();
 }
