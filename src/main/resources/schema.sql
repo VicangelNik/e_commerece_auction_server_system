@@ -61,12 +61,12 @@ CREATE TABLE item_categories ( -- many-to-many relationship
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
-CREATE TABLE bids (                     -- προσφορές
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    auction_id BIGINT         NOT NULL, -- η δημοπρασία για την οποία κάνει τη προσφορά
-    bidder_id  BIGINT         NOT NULL, -- indicates the user id
-    time       DATETIME       NOT NULL, -- Χρόνος υποβολής της προσφοράς. Πρέπει να είναι μεταγενέστερο του χρόνου έναρξης της ψηφοφορίας και προγενέστερο του χρόνου λήξης της. Ένας χρήστης μπορεί να υποβάλλει πολλαπλές προσφορές σε μια δημοπρασία αλλά σε διαφορετικό χρόνο.
-    amount     DECIMAL(10, 2) NOT NULL, -- το ποσό της προσφοράς
+CREATE TABLE bids (                         -- προσφορές
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    auction_id     BIGINT         NOT NULL, -- η δημοπρασία για την οποία κάνει τη προσφορά
+    bidder_id      BIGINT         NOT NULL, -- indicates the user id
+    time_submitted DATETIME       NOT NULL, -- Χρόνος υποβολής της προσφοράς. Πρέπει να είναι μεταγενέστερο του χρόνου έναρξης της ψηφοφορίας και προγενέστερο του χρόνου λήξης της. Ένας χρήστης μπορεί να υποβάλλει πολλαπλές προσφορές σε μια δημοπρασία αλλά σε διαφορετικό χρόνο.
+    amount         DECIMAL(10, 2) NOT NULL, -- το ποσό της προσφοράς
     FOREIGN KEY (auction_id) REFERENCES auctions(id),
     FOREIGN KEY (bidder_id) REFERENCES users(id)
 );

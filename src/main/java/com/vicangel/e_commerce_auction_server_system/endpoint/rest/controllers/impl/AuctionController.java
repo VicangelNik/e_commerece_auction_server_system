@@ -16,6 +16,7 @@ import com.vicangel.e_commerce_auction_server_system.core.api.AuctionService;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.api.AuctionOpenAPI;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.AuctionItemDTO;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveAuctionRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveBidRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.AuctionResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.mappers.AuctionEndpointMapper;
 import jakarta.validation.Valid;
@@ -86,6 +87,16 @@ final class AuctionController implements AuctionOpenAPI {
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
+
+  @PostMapping(value = "/bid", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+  @Override
+  public ResponseEntity<Long> addBid(@Valid @RequestBody final SaveBidRequest request) {
+
+    final long result = service.bid(mapper.mapBidRequestToModel(request));
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+  }
+
 //
 //  @GetMapping(value = "/{id}/categories", produces = APPLICATION_JSON_VALUE)
 //  @Override

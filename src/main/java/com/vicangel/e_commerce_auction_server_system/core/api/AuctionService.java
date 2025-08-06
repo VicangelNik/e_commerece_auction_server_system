@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.vicangel.e_commerce_auction_server_system.core.model.Auction;
 import com.vicangel.e_commerce_auction_server_system.core.model.AuctionItem;
+import com.vicangel.e_commerce_auction_server_system.core.model.Bid;
 
 public interface AuctionService {
 
@@ -23,4 +24,6 @@ public interface AuctionService {
   Optional<Auction> findById(Long id);
 
   List<Auction> findAll();
+
+  long bid(Bid bid);
 }

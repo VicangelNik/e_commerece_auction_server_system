@@ -14,4 +14,6 @@ public interface UserOpenAPI {
   ResponseEntity<UserResponse> findById(long id);
 
   ResponseEntity<List<UserResponse>> findAll();
+
+  ResponseEntity<Void> updateUser(long id, SaveUserRequest request);
 }

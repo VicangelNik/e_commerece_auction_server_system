@@ -5,8 +5,9 @@ import java.util.Optional;
 
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.AuctionEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.AuctionItemEntity;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.BidEntity;
 
-public interface ActionRepository {
+public interface AuctionRepository {
 
   /**
    * @return auction ID
@@ -23,4 +24,9 @@ public interface ActionRepository {
   Optional<AuctionEntity> findById(long id);
 
   List<AuctionEntity> findAll();
+
+  /**
+   * @return Bid ID
+   */
+  long saveBid(BidEntity entity);
 }

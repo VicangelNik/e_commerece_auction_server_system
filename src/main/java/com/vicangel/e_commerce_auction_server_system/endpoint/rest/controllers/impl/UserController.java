@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,12 +64,13 @@ final class UserController implements UserOpenAPI {
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-//  @PutMapping(value = "/update/{id}", consumes = APPLICATION_JSON_VALUE)
-//  @Override
-//  public ResponseEntity<Void> updateUser(@PathVariable final long id) {
-//
-//    service.updateUser(id);
-//
-//    return ResponseEntity.status(HttpStatus.OK).body(response);
-//  }
+  @PutMapping(value = "/{id}", consumes = APPLICATION_JSON_VALUE)
+  @Override
+  public ResponseEntity<Void> updateUser(@PathVariable final long id,
+                                         @RequestBody final SaveUserRequest request) {
+
+    service.updateUser(id, mapper.mapRequestToModel(request));
+
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
 }

@@ -29,6 +29,12 @@ public class UserRepositoryImpl implements UserRepository {
                                     seller_rating, location, country) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
     """;
   private static final String findAllSQL = "SELECT * FROM users";
+  private static final String updateSQL = """
+    UPDATE `auction-db`.users
+    SET username = ?, password = ?, name = ?, surname = ?, email = ?, phone = ?,
+        afm = ?, bidder_rating = ?, seller_rating = ?, location = ?, country = ?
+    WHERE id = ?;
+    """;
   private final JdbcTemplate jdbcTemplate;
 
   @Override
@@ -75,5 +81,21 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public List<UserEntity> findAll() {
     return jdbcTemplate.queryForList(findAllSQL, UserEntity.class);
+  }
+
+  @Override
+  public int updateUser(UserEntity userToUpdate) {
+    return jdbcTemplate.update(updateSQL,
+                               userToUpdate.username(),
+                               userToUpdate.password(),
+                               userToUpdate.name(),
+                               userToUpdate.surname(),
+                               userToUpdate.email(),
+                               userToUpdate.phone(),
+                               userToUpdate.afm(),
+                               userToUpdate.bidderRating(),
+                               userToUpdate.sellerRating(),
+                               userToUpdate.location(),
+                               userToUpdate.country());
   }
 }

@@ -10,7 +10,8 @@ import com.vicangel.e_commerce_auction_server_system.core.api.AuctionService;
 import com.vicangel.e_commerce_auction_server_system.core.mappers.AuctionCoreMapper;
 import com.vicangel.e_commerce_auction_server_system.core.model.Auction;
 import com.vicangel.e_commerce_auction_server_system.core.model.AuctionItem;
-import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.ActionRepository;
+import com.vicangel.e_commerce_auction_server_system.core.model.Bid;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.AuctionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 final class AuctionServiceImpl implements AuctionService {
 
   private final AuctionCoreMapper mapper;
-  private final ActionRepository repository;
+  private final AuctionRepository repository;
 
   @Override
   public long saveAuction(@NonNull final Auction auction) {
@@ -52,5 +53,10 @@ final class AuctionServiceImpl implements AuctionService {
       .stream()
       .map(mapper::mapEntityToModel)
       .toList();
+  }
+
+  @Override
+  public long bid(@NonNull final Bid bid) {
+    return repository.saveBid(mapper.mapBidModelToEntity(bid));
   }
 }

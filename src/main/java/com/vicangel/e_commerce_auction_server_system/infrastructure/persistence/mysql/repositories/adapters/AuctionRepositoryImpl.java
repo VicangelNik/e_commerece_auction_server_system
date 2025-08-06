@@ -17,14 +17,15 @@ import org.springframework.stereotype.Repository;
 import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCodes;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.AuctionEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.AuctionItemEntity;
-import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.ActionRepository;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.BidEntity;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.AuctionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class ActionRepositoryImpl implements ActionRepository {
+public class AuctionRepositoryImpl implements AuctionRepository {
 
   private static final String insertAuctionSQL = "INSERT INTO auctions (created, ends, first_bid, number_of_bids, seller_id) VALUES (?,?,?,?,?)";
   private static final String insertAuctionItemSQL = "INSERT INTO auction_items (auction_id, name, description, location, latitude, longitude, country) VALUES (?,?,?,?,?,?,?)";
@@ -44,9 +45,8 @@ public class ActionRepositoryImpl implements ActionRepository {
                 INNER JOIN `auction-db`.item_image ii ON ii.item_id = ai.id
                 INNER JOIN `auction-db`.bids b on ac.id = b.auction_id
     """;
-
   private static final String findByIdClauseSQL = " WHERE ac.id = ?";
-
+  private static final String insertBidSQL = "INSERT INTO bids (auction_id, bidder_id, time_submitted, amount) VALUES (?,?,?,?)";
   private final JdbcTemplate jdbcTemplate;
 
   public long save(final @NonNull AuctionEntity entity) {
@@ -135,5 +135,24 @@ public class ActionRepositoryImpl implements ActionRepository {
   @Override
   public List<AuctionEntity> findAll() {
     return jdbcTemplate.queryForList(findAllSQL, AuctionEntity.class);
+  }
+
+  @Override
+  public long saveBid(@NonNull final BidEntity entity) {
+
+    final var keyHolder = new GeneratedKeyHolder();
+
+    jdbcTemplate.update(connection -> {
+      PreparedStatement ps = connection.prepareStatement(insertBidSQL, Statement.RETURN_GENERATED_KEYS);
+      ps.setLong(1, entity.auctionId());
+      ps.setLong(2, entity.bidderId());
+      ps.setTimestamp(3, Timestamp.from(entity.bidSubmittedTime()));
+      ps.setDouble(4, entity.amount());
+      return ps;
+    }, keyHolder);
+
+    if (keyHolder.getKey() == null) return ErrorCodes.SQL_ERROR.getCode();
+
+    return keyHolder.getKey().longValue();
   }
 }

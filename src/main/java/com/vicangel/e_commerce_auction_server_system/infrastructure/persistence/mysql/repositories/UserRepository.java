@@ -15,4 +15,10 @@ public interface UserRepository {
   Optional<UserEntity> findById(long id);
 
   List<UserEntity> findAll();
+
+  /**
+   *
+   * @return the number of rows affected
+   */
+  int updateUser(UserEntity userToUpdate);
 }
