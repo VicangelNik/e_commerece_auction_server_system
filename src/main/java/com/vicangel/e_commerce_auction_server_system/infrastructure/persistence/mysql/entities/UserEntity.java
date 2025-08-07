@@ -2,6 +2,9 @@ package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence
 
 import java.time.Instant;
 
+import lombok.Builder;
+
+@Builder
 public record UserEntity(Long id,
                          Instant created,
                          String username,

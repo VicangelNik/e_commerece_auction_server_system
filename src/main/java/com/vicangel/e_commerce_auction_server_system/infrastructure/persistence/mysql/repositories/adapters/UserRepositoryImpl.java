@@ -2,14 +2,16 @@
 package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.adapters;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
@@ -67,20 +69,17 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public Optional<UserEntity> findById(final long id) {
     try {
-      UserEntity entity = jdbcTemplate.queryForObject(
-        findByIdSQL,
-        new BeanPropertyRowMapper<>(UserEntity.class),
-        id
-      );
-      return Optional.ofNullable(entity);
+      return Optional.ofNullable(jdbcTemplate.queryForObject(findByIdSQL,
+                                                             new UserEntityRowMapper(),
+                                                             id));
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
   }
 
   @Override
-  public List<UserEntity> findAll() {
-    return jdbcTemplate.queryForList(findAllSQL, UserEntity.class);
+  public Stream<UserEntity> findAll() { // maybe check this https://github.com/spring-projects/spring-framework/issues/27988
+    return jdbcTemplate.queryForStream(findAllSQL, new UserEntityRowMapper());
   }
 
   @Override
@@ -97,5 +96,27 @@ public class UserRepositoryImpl implements UserRepository {
                                userToUpdate.sellerRating(),
                                userToUpdate.location(),
                                userToUpdate.country());
+  }
+
+  private static final class UserEntityRowMapper implements RowMapper<UserEntity> {
+
+    @Override
+    public UserEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+      return UserEntity.builder()
+        .id(rs.getLong("id"))
+        .created(rs.getTimestamp("created").toInstant())
+        .username(rs.getString("username"))
+        .password(rs.getString("password"))
+        .name(rs.getString("name"))
+        .surname(rs.getString("surname"))
+        .email(rs.getString("email"))
+        .phone(rs.getString("phone"))
+        .afm(rs.getString("afm"))
+        .bidderRating(rs.getInt("bidder_rating"))
+        .sellerRating(rs.getInt("seller_rating"))
+        .location(rs.getString("location"))
+        .country(rs.getString("country"))
+        .build();
+    }
   }
 }

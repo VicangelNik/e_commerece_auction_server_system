@@ -37,7 +37,6 @@ final class UserServiceImpl implements UserService {
   public List<User> findAll() {
     return repository
       .findAll()
-      .stream()
       .map(mapper::mapEntityToModel)
       .toList();
   }
