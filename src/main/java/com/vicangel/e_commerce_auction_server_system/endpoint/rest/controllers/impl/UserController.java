@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.UserService;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.api.UserOpenAPI;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveUserRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveOrUpdatedUserRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.UserResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.mappers.UserEndpointMapper;
-import jakarta.validation.Valid;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.validation.SaveUser;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.validation.UpdateUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,15 +28,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 @RestController
+@Validated
 @Slf4j
-final class UserController implements UserOpenAPI {
+class UserController implements UserOpenAPI {
 
   private final UserEndpointMapper mapper;
   private final UserService service;
 
   @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<Long> addUser(@Valid @RequestBody final SaveUserRequest request) {
+  public ResponseEntity<Long> addUser(@Validated(SaveUser.class) @RequestBody final SaveOrUpdatedUserRequest request) {
 
     final long result = service.insertUser(mapper.mapRequestToModel(request));
 
@@ -67,7 +70,7 @@ final class UserController implements UserOpenAPI {
   @PutMapping(value = "/{id}", consumes = APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<Void> updateUser(@PathVariable final long id,
-                                         @RequestBody final SaveUserRequest request) {
+                                         @Validated(UpdateUser.class) @RequestBody final SaveOrUpdatedUserRequest request) {
 
     service.updateUser(id, mapper.mapRequestToModel(request));
 

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -52,12 +53,12 @@ public class UserRepositoryImpl implements UserRepository {
       ps.setString(4, entity.name());
       ps.setString(5, entity.surname());
       ps.setString(6, entity.email());
-      ps.setString(7, entity.phone());
-      ps.setString(8, entity.afm());
-      ps.setInt(9, entity.bidderRating());
-      ps.setInt(10, entity.sellerRating());
-      ps.setString(11, entity.location());
-      ps.setString(12, entity.country());
+      ps.setObject(7, entity.phone(), Types.VARCHAR); // might be null, hence, this differentiation.
+      ps.setObject(8, entity.afm(), Types.VARCHAR);
+      ps.setObject(9, entity.bidderRating(), Types.INTEGER);
+      ps.setObject(10, entity.sellerRating(), Types.INTEGER);
+      ps.setObject(11, entity.location(), Types.VARCHAR);
+      ps.setObject(12, entity.country(), Types.VARCHAR);
       return ps;
     }, keyHolder);
 
@@ -95,11 +96,18 @@ public class UserRepositoryImpl implements UserRepository {
                                userToUpdate.bidderRating(),
                                userToUpdate.sellerRating(),
                                userToUpdate.location(),
-                               userToUpdate.country());
+                               userToUpdate.country(),
+                               userToUpdate.id());
   }
 
   private static final class UserEntityRowMapper implements RowMapper<UserEntity> {
 
+    /**
+     * @param rs     the {@code ResultSet} to map (pre-initialized for the current row)
+     * @param rowNum the number of the current row
+     *
+     * @implNote jdbc returns 0 if written like rs.getInt as it returns primitive types but written with getObject it will return null
+     */
     @Override
     public UserEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
       return UserEntity.builder()
@@ -110,12 +118,12 @@ public class UserRepositoryImpl implements UserRepository {
         .name(rs.getString("name"))
         .surname(rs.getString("surname"))
         .email(rs.getString("email"))
-        .phone(rs.getString("phone"))
-        .afm(rs.getString("afm"))
-        .bidderRating(rs.getInt("bidder_rating"))
-        .sellerRating(rs.getInt("seller_rating"))
-        .location(rs.getString("location"))
-        .country(rs.getString("country"))
+        .phone(rs.getObject("phone", String.class))
+        .afm(rs.getObject("afm", String.class))
+        .bidderRating(rs.getObject("bidder_rating", Integer.class))
+        .sellerRating(rs.getObject("seller_rating", Integer.class))
+        .location(rs.getObject("location", String.class))
+        .country(rs.getObject("country", String.class))
         .build();
     }
   }
