@@ -1,4 +1,4 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.impl;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers;
 
 import java.util.List;
 
@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.AuctionService;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.api.AuctionOpenAPI;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.AuctionItemDTO;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveAuctionRequest;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveBidRequest;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.AuctionResponse;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.mappers.AuctionEndpointMapper;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.AuctionOpenAPI;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.AuctionItemDTO;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveAuctionRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveBidRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.AuctionResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers.AuctionEndpointMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

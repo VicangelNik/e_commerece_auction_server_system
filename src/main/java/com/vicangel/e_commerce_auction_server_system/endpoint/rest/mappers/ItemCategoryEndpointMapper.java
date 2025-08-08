@@ -1,12 +1,12 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.mappers;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
 
 import com.vicangel.e_commerce_auction_server_system.core.model.ItemCategory;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveItemCategoryRequest;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.ItemCategoryResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveItemCategoryRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.ItemCategoryResponse;
 
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface ItemCategoryEndpointMapper {

@@ -1,4 +1,4 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response;
 
 import java.time.Instant;
 

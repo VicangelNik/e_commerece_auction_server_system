@@ -1,7 +1,7 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request;
 
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.validation.SaveUser;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.validation.UpdateUser;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.validation.SaveUser;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.validation.UpdateUser;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 

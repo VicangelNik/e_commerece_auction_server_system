@@ -1,10 +1,10 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response;
 
 import java.time.Instant;
 import java.util.Set;
 
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.AuctionItemDTO;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.BidDTO;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.AuctionItemDTO;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.BidDTO;
 
 public record AuctionResponse(Long id,
                               Instant created,

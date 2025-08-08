@@ -1,4 +1,4 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.impl;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers;
 
 import java.util.List;
 
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.ItemCategoryService;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.api.ItemCategoryOpenAPI;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveItemCategoryRequest;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.ItemCategoryResponse;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.mappers.ItemCategoryEndpointMapper;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.ItemCategoryOpenAPI;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveItemCategoryRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.ItemCategoryResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers.ItemCategoryEndpointMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

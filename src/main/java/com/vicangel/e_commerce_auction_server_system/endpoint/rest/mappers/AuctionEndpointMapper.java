@@ -1,4 +1,4 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.mappers;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -7,10 +7,10 @@ import org.mapstruct.MappingConstants.ComponentModel;
 import com.vicangel.e_commerce_auction_server_system.core.model.Auction;
 import com.vicangel.e_commerce_auction_server_system.core.model.AuctionItem;
 import com.vicangel.e_commerce_auction_server_system.core.model.Bid;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.AuctionItemDTO;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveAuctionRequest;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveBidRequest;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.AuctionResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.AuctionItemDTO;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveAuctionRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveBidRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.AuctionResponse;
 
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface AuctionEndpointMapper {

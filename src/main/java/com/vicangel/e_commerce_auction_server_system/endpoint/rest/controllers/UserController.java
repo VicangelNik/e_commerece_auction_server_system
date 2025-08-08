@@ -1,4 +1,4 @@
-package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.impl;
+package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers;
 
 import java.util.List;
 
@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.UserService;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.api.UserOpenAPI;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.request.SaveOrUpdatedUserRequest;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.dto.response.UserResponse;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.mappers.UserEndpointMapper;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.validation.SaveUser;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers.validation.UpdateUser;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.UserOpenAPI;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveOrUpdatedUserRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.UserResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers.UserEndpointMapper;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.validation.SaveUser;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.validation.UpdateUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
