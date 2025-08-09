@@ -3,6 +3,7 @@ package com.vicangel.e_commerce_auction_server_system.endpoint.rest;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.Ordered;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.vicangel.e_commerce_auction_server_system.core.error.ItemCategoryException;
 import com.vicangel.e_commerce_auction_server_system.core.error.UserException;
 import com.vicangel.e_commerce_auction_server_system.core.error.UserIdNotFoundException;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path.Node;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -26,7 +29,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @Slf4j
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ExceptionHandler(value = MethodArgumentNotValidException.class)
   protected ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
     log.error(ex.getMessage(), ex);
     List<String> errors = new ArrayList<>(ex.getFieldErrors().stream()
@@ -55,6 +58,26 @@ public class GlobalExceptionHandler {
   protected ResponseEntity<Object> handleIdNotFoundException(RuntimeException ex) {
     log.error(ex.getMessage(), ex);
     final var apiError = new ApiError(List.of(ex.getMessage()));
+    return buildResponseEntity(BAD_REQUEST, apiError);
+  }
+
+  /**
+   *
+   * @implNote if getConstraintViolations are not handled like this the message will be like -> updateUser.id: must be greater than 0
+   *   however, the desired result is -> id -> must be greater than 0
+   */
+  @ExceptionHandler(ConstraintViolationException.class)
+  protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+    final List<String> errors = ex.getConstraintViolations().stream().map(
+      violation ->
+        StreamSupport.stream(violation.getPropertyPath().spliterator(), false)
+          .reduce((first, second) -> second)
+          .map(Node::getName)
+          .orElse("") + " " + violation.getMessage()
+    ).toList();
+
+    log.error(ex.getMessage(), ex);
+    final var apiError = new ApiError(errors);
     return buildResponseEntity(BAD_REQUEST, apiError);
   }
 
