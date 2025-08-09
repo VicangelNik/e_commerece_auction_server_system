@@ -1,17 +1,20 @@
 package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.adapters;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
+import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCodes;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.ItemCategoryEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.CategoryItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,25 +42,38 @@ public class CategoryItemRepositoryImpl implements CategoryItemRepository {
 
     if (keyHolder.getKey() != null) return keyHolder.getKey().longValue();
 
-    return 0;
+    return ErrorCodes.SQL_ERROR.getCode();
   }
 
   @Override
   public Optional<ItemCategoryEntity> findById(final long id) {
     try {
-      ItemCategoryEntity entity = jdbcTemplate.queryForObject(
+      return Optional.ofNullable(jdbcTemplate.queryForObject(
         findByIdSQL,
-        new BeanPropertyRowMapper<>(ItemCategoryEntity.class),
+        new ItemCategoryEntityRowMapper(),
         id
-      );
-      return Optional.ofNullable(entity);
+      ));
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
   }
 
   @Override
-  public List<ItemCategoryEntity> findAll() {
-    return jdbcTemplate.queryForList(findAllSQL, ItemCategoryEntity.class);
+  public Stream<ItemCategoryEntity> findAll() {
+    return jdbcTemplate.queryForStream(findAllSQL, new ItemCategoryEntityRowMapper());
+  }
+
+  private static final class ItemCategoryEntityRowMapper implements RowMapper<ItemCategoryEntity> {
+
+    /**
+     * @param rs     the {@code ResultSet} to map (pre-initialized for the current row)
+     * @param rowNum the number of the current row
+     **/
+    @Override
+    public ItemCategoryEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+      return new ItemCategoryEntity(rs.getLong("id"),
+                                    rs.getString("name"),
+                                    rs.getString("description"));
+    }
   }
 }

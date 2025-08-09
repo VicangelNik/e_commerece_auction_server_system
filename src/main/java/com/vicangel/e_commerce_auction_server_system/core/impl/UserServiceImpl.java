@@ -7,8 +7,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.UserService;
+import com.vicangel.e_commerce_auction_server_system.core.error.UserException;
+import com.vicangel.e_commerce_auction_server_system.core.error.UserIdNotFoundException;
 import com.vicangel.e_commerce_auction_server_system.core.mappers.UserCoreMapper;
 import com.vicangel.e_commerce_auction_server_system.core.model.User;
+import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCodes;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +26,13 @@ final class UserServiceImpl implements UserService {
 
   @Override
   public long insertUser(final @NonNull User user) {
-    return repository.insertUser(mapper.mapModelToEntity(user));
+    final long id = repository.insertUser(mapper.mapModelToEntity(user));
+
+    if (id == ErrorCodes.SQL_ERROR.getCode()) {
+      throw new UserException("Error occurred, inserting user item");
+    }
+
+    return id;
   }
 
   @Override
@@ -60,10 +69,10 @@ final class UserServiceImpl implements UserService {
         .location(updatedUser.location() != null ? updatedUser.location() : existingUser.location())
         .country(updatedUser.country() != null ? updatedUser.country() : existingUser.country())
         .build())
-      .orElseThrow(() -> new IllegalArgumentException("User not found"));
+      .orElseThrow(() -> new UserIdNotFoundException("User not found with id: " + id));
 
     final int rowsAffected = repository.updateUser(mapper.mapModelToEntity(userToUpdate));
 
-    if (rowsAffected == 0) throw new IllegalArgumentException("Update user failed with id: " + id);
+    if (rowsAffected == 0) throw new UserException("Updating user failed with id: " + id);
   }
 }

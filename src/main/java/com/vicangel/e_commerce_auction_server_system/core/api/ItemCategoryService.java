@@ -9,7 +9,7 @@ public interface ItemCategoryService {
 
   long addCategoryItem(ItemCategory category);
 
-  Optional<ItemCategory> findById(Long id);
+  Optional<ItemCategory> findById(long id);
 
   List<ItemCategory> findAll();
 }

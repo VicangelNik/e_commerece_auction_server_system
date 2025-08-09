@@ -1,6 +1,7 @@
 package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,17 +53,19 @@ class UserController implements UserOpenAPI {
   @Override
   public ResponseEntity<UserResponse> findById(@PathVariable final long id) {
 
-    UserResponse response = service.findById(id).map(mapper::mapModelToResponse)
-      .orElseThrow(() -> new IllegalArgumentException("Not Found"));
+    Optional<UserResponse> response = service.findById(id).map(mapper::mapModelToResponse);
 
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return response.map(r -> ResponseEntity.status(HttpStatus.OK).body(r))
+      .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<List<UserResponse>> findAll() {
 
-    List<UserResponse> response = service.findAll().stream().map(mapper::mapModelToResponse).toList();
+    final List<UserResponse> response = service.findAll().stream().map(mapper::mapModelToResponse).toList();
+
+    if (response.isEmpty()) return ResponseEntity.notFound().build();
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }

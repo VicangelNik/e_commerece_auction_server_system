@@ -1,6 +1,7 @@
 package com.vicangel.e_commerce_auction_server_system.endpoint.rest.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +38,6 @@ final class ItemCategoryController implements ItemCategoryOpenAPI {
 
     final long result = service.addCategoryItem(mapper.mapRequestToModel(request));
 
-    if (result == 0) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
-    }
-
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
@@ -48,17 +45,21 @@ final class ItemCategoryController implements ItemCategoryOpenAPI {
   @Override
   public ResponseEntity<ItemCategoryResponse> findById(@PathVariable final long id) {
 
-    ItemCategoryResponse response = service.findById(id).map(mapper::mapModelToResponse)
-      .orElseThrow(() -> new IllegalArgumentException("Not Found"));
+    Optional<ItemCategoryResponse> response = service.findById(id).map(mapper::mapModelToResponse);
 
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return response.map(r -> ResponseEntity.status(HttpStatus.OK).body(r))
+      .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<List<ItemCategoryResponse>> findAll() {
 
-    List<ItemCategoryResponse> response = service.findAll().stream().map(mapper::mapModelToResponse).toList();
+    final List<ItemCategoryResponse> response = service.findAll().stream()
+      .map(mapper::mapModelToResponse)
+      .toList();
+
+    if (response.isEmpty()) return ResponseEntity.notFound().build();
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
