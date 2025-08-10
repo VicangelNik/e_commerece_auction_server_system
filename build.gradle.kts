@@ -27,6 +27,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-jdbc")
   implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-validation:3.5.4")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
   implementation("org.mapstruct:mapstruct:1.6.3")
   compileOnly("org.projectlombok:lombok")
   runtimeOnly("com.mysql:mysql-connector-j")

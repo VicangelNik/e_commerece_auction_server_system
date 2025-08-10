@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveItemCategoryRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.ItemCategoryResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -16,7 +17,7 @@ import jakarta.validation.constraints.Positive;
  */
 public interface ItemCategoryOpenAPI {
 
-  ResponseEntity<Long> addCategory(SaveItemCategoryRequest request);
+  ResponseEntity<IdResponse> addCategory(@Valid SaveItemCategoryRequest request);
 
   ResponseEntity<ItemCategoryResponse> findById(@Valid @Positive long id);
 

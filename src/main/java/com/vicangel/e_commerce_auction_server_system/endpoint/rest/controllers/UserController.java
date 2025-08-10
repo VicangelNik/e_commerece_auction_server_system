@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vicangel.e_commerce_auction_server_system.core.api.UserService;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.UserOpenAPI;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveOrUpdatedUserRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.UserResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers.UserEndpointMapper;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.validation.SaveUser;
@@ -38,15 +39,11 @@ class UserController implements UserOpenAPI {
 
   @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<Long> addUser(@Validated(SaveUser.class) @RequestBody final SaveOrUpdatedUserRequest request) {
+  public ResponseEntity<IdResponse> addUser(@Validated(SaveUser.class) @RequestBody final SaveOrUpdatedUserRequest request) {
 
     final long result = service.insertUser(mapper.mapRequestToModel(request));
 
-    if (result == 0) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
-    }
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)

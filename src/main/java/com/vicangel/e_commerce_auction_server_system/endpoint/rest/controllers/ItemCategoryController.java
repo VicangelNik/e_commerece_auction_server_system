@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vicangel.e_commerce_auction_server_system.core.api.ItemCategoryService;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.ItemCategoryOpenAPI;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveItemCategoryRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.ItemCategoryResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers.ItemCategoryEndpointMapper;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,11 +34,11 @@ final class ItemCategoryController implements ItemCategoryOpenAPI {
 
   @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<Long> addCategory(@Valid @RequestBody final SaveItemCategoryRequest request) {
+  public ResponseEntity<IdResponse> addCategory(@RequestBody final SaveItemCategoryRequest request) {
 
     final long result = service.addCategoryItem(mapper.mapRequestToModel(request));
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)

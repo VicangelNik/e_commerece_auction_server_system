@@ -18,6 +18,7 @@ import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.AuctionIt
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveAuctionRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveBidRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.AuctionResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers.AuctionEndpointMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,15 +37,15 @@ final class AuctionController implements AuctionOpenAPI {
 
   @PostMapping(value = "/create", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<Long> createAuction(@Valid @RequestBody final SaveAuctionRequest request) {
+  public ResponseEntity<IdResponse> createAuction(@Valid @RequestBody final SaveAuctionRequest request) {
 
     final long result = service.saveAuction(mapper.mapRequestToModel(request));
 
     if (result != 1) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new IdResponse(result));
     }
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }
 
   @PatchMapping(value = "/{id}/begin")
@@ -58,20 +59,20 @@ final class AuctionController implements AuctionOpenAPI {
 
   @PostMapping(value = "/add/item", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<Long> addAuctionItem(@Valid @RequestBody final AuctionItemDTO request) {
+  public ResponseEntity<IdResponse> addAuctionItem(@Valid @RequestBody final AuctionItemDTO request) {
 
     final long result = service.addAuctionItem(mapper.mapAuctionRequestToModel(request));
 
     if (result != 1) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new IdResponse(result));
     }
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<AuctionResponse> findById(long id) {
+  public ResponseEntity<AuctionResponse> findById(@PathVariable final long id) {
 
     final var response = service.findById(id).map(mapper::mapModelToResponse)
       .orElseThrow(() -> new IllegalArgumentException("Not Found"));
@@ -90,11 +91,11 @@ final class AuctionController implements AuctionOpenAPI {
 
   @PostMapping(value = "/bid", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<Long> addBid(@Valid @RequestBody final SaveBidRequest request) {
+  public ResponseEntity<IdResponse> addBid(@Valid @RequestBody final SaveBidRequest request) {
 
     final long result = service.bid(mapper.mapBidRequestToModel(request));
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }
 
 //
