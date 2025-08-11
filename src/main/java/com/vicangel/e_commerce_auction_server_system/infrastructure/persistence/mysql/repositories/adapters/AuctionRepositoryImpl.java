@@ -71,8 +71,8 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   }
 
   @Override
-  public void beginAuction(final long auctionId) {
-    this.jdbcTemplate.update("UPDATE auctions set started = ? where id = ?", Instant.now(), auctionId);
+  public int beginAuction(final long auctionId) {
+    return this.jdbcTemplate.update("UPDATE auctions set started = ? where id = ?", Instant.now(), auctionId);
   }
 
   @Override

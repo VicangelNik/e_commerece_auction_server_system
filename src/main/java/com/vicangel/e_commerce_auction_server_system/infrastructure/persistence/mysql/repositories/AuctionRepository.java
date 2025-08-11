@@ -14,7 +14,7 @@ public interface AuctionRepository {
    */
   long save(AuctionEntity entity);
 
-  void beginAuction(long auctionId);
+  int beginAuction(long auctionId);
 
   /**
    * @return auction item ID

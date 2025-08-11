@@ -21,6 +21,7 @@ public interface AuctionCoreMapper {
 
   AuctionItemEntity mapAuctionItemModelToEntity(AuctionItem auctionItem);
 
+  @Mapping(target = "bidSubmittedTime", defaultExpression = "java(java.time.Instant.now())")
   BidEntity mapBidModelToEntity(Bid bid);
 }
 

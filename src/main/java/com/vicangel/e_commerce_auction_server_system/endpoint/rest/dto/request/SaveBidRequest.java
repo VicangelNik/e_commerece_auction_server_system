@@ -1,9 +1,9 @@
 package com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request;
 
-import java.time.Instant;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
-public record SaveBidRequest(Long auctionId,
-                             Long bidderId,
-                             Instant bidSubmittedTime,
-                             Double amount) {
+public record SaveBidRequest(@NotNull @Positive Long auctionId,
+                             @NotNull @Positive Long bidderId,
+                             @NotNull @Positive Double amount) {
 }

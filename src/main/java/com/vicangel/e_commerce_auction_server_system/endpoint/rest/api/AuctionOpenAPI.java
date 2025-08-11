@@ -9,18 +9,20 @@ import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.S
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveBidRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.AuctionResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 public interface AuctionOpenAPI {
 
-  ResponseEntity<IdResponse> createAuction(SaveAuctionRequest request);
+  ResponseEntity<IdResponse> createAuction(@Valid SaveAuctionRequest request);
 
-  ResponseEntity<Void> beginAuction(long auctionId);
+  ResponseEntity<Void> beginAuction(@Valid @Positive long auctionId);
 
-  ResponseEntity<IdResponse> addAuctionItem(AuctionItemDTO request);
+  ResponseEntity<IdResponse> addAuctionItem(@Valid AuctionItemDTO request);
 
-  ResponseEntity<AuctionResponse> findById(long id);
+  ResponseEntity<AuctionResponse> findById(@Valid @Positive long id);
 
   ResponseEntity<List<AuctionResponse>> findAll();
 
-  ResponseEntity<IdResponse> addBid(SaveBidRequest request);
+  ResponseEntity<IdResponse> addBid(@Valid SaveBidRequest request);
 }

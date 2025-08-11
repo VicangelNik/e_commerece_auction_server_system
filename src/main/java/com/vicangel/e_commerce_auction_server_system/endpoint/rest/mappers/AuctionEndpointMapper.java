@@ -26,5 +26,6 @@ public interface AuctionEndpointMapper {
   AuctionItem mapAuctionRequestToModel(AuctionItemDTO request);
 
   @Mapping(target = "id", ignore = true)
+  @Mapping(target = "bidSubmittedTime", ignore = true)
   Bid mapBidRequestToModel(SaveBidRequest request);
 }
