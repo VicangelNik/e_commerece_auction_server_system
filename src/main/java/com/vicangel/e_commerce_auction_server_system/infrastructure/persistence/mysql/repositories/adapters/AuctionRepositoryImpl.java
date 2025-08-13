@@ -37,15 +37,16 @@ public class AuctionRepositoryImpl implements AuctionRepository {
        FROM `auction-db`.auctions ac
                 LEFT JOIN `auction-db`.bids b on ac.id = b.auction_id
     """;
-  private static final String findAllItemsSQL = """
+  private static final String findItemByIdSQL = """
        SELECT
            ai.id, ai.name, ai.description, ai.location, ai.latitude, ai.longitude, ai.country,
-           c.id, c.name,
+           c.id, c.name, c.description
            ii.name, ii.description, ii.type, ii.image
        FROM `auction-db`.auction_items ai on ac.id = ai.auction_id
                 LEFT JOIN `auction-db`.item_categories ic ON ic.auction_item_id = ai.id
                 LEFT JOIN `auction-db`.categories c ON c.id = ic.category_id
                 LEFT JOIN `auction-db`.item_image ii ON ii.item_id = ai.id
+       WHERE ai.auction_id = ?
     """;
 
   private static final String findByIdClauseSQL = " WHERE ac.id = ?";

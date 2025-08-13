@@ -10,6 +10,6 @@ public record AuctionItem(Long id,
                           Double latitude,
                           Double longitude,
                           String country,
-                          Set<Long> categories,
+                          Set<ItemCategory> categories,
                           ItemImage image) {
 }
