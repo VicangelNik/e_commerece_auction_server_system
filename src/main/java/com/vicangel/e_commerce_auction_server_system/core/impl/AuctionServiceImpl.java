@@ -56,16 +56,16 @@ final class AuctionServiceImpl implements AuctionService {
   }
 
   @Override
-  public Optional<Auction> findById(Long id) {
+  public Optional<Auction> findById(final long id, final boolean fetchItems) {
     return repository
-      .findById(id)
+      .findById(id, fetchItems)
       .map(mapper::mapEntityToModel);
   }
 
   @Override
-  public List<Auction> findAll() {
+  public List<Auction> findAll(final boolean fetchItems) {
     return repository
-      .findAll()
+      .findAll(fetchItems)
       .stream()
       .map(mapper::mapEntityToModel)
       .toList();

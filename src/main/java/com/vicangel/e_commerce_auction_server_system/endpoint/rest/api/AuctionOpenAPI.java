@@ -20,9 +20,9 @@ public interface AuctionOpenAPI {
 
   ResponseEntity<IdResponse> addAuctionItem(@Valid AuctionItemDTO request);
 
-  ResponseEntity<AuctionResponse> findById(@Valid @Positive long id);
+  ResponseEntity<AuctionResponse> findById(@Valid @Positive long id, boolean fetchItems);
 
-  ResponseEntity<List<AuctionResponse>> findAll();
+  ResponseEntity<List<AuctionResponse>> findAll(boolean fetchItems);
 
   ResponseEntity<IdResponse> addBid(@Valid SaveBidRequest request);
 }

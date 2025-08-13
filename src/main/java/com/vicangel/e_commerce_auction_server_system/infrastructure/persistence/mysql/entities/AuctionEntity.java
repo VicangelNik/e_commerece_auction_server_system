@@ -3,6 +3,9 @@ package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence
 import java.time.Instant;
 import java.util.Set;
 
+import lombok.Builder;
+
+@Builder
 public record AuctionEntity(Long id,
                             Instant created,
                             Instant started,

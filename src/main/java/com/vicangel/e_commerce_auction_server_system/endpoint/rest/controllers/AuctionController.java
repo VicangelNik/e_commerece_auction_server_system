@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.AuctionService;
@@ -63,8 +64,8 @@ final class AuctionController implements AuctionOpenAPI {
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<AuctionResponse> findById(@PathVariable final long id) {
-    return service.findById(id)
+  public ResponseEntity<AuctionResponse> findById(@PathVariable final long id, @RequestParam final boolean fetchItems) {
+    return service.findById(id, fetchItems)
       .map(mapper::mapModelToResponse)
       .map(r -> ResponseEntity.status(HttpStatus.OK).body(r))
       .orElseGet(() -> ResponseEntity.notFound().build());
@@ -72,9 +73,9 @@ final class AuctionController implements AuctionOpenAPI {
 
   @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<List<AuctionResponse>> findAll() {
+  public ResponseEntity<List<AuctionResponse>> findAll(@RequestParam final boolean fetchItems) {
 
-    List<AuctionResponse> response = service.findAll().stream().map(mapper::mapModelToResponse).toList();
+    List<AuctionResponse> response = service.findAll(fetchItems).stream().map(mapper::mapModelToResponse).toList();
 
     if (response.isEmpty()) return ResponseEntity.notFound().build();
 

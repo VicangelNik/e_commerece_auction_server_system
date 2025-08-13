@@ -21,9 +21,9 @@ public interface AuctionService {
    */
   long addAuctionItem(AuctionItem auctionItem);
 
-  Optional<Auction> findById(Long id);
+  Optional<Auction> findById(long id, boolean fetchItems);
 
-  List<Auction> findAll();
+  List<Auction> findAll(boolean fetchItems);
 
   long bid(Bid bid);
 }

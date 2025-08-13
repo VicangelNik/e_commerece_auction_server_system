@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
@@ -22,6 +23,7 @@ import jakarta.validation.constraints.Positive;
  *   jakarta.validation.ConstraintDeclarationException: HV000151:
  *   A method overriding another method must not redefine the parameter constraint configuration
  */
+@Tag(name = "User Controller", description = "Api to accept requests regarding user operations")
 public interface UserOpenAPI {
 
   @Operation(summary = "Add new user to system", operationId = "UserAdd", tags = "UserApi")
@@ -38,7 +40,8 @@ public interface UserOpenAPI {
                  "savedId": 2
                }
               """
-          )})})
+          )})}),
+    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(hidden = true)))
   })
   ResponseEntity<IdResponse> addUser(SaveOrUpdatedUserRequest request);
 

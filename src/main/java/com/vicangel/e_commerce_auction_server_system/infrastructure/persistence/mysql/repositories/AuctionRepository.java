@@ -21,9 +21,9 @@ public interface AuctionRepository {
    */
   long insertAuctionItem(AuctionItemEntity entity);
 
-  Optional<AuctionEntity> findById(long id);
+  Optional<AuctionEntity> findById(long id, boolean fetchItems);
 
-  List<AuctionEntity> findAll();
+  List<AuctionEntity> findAll(boolean fetchItems);
 
   /**
    * @return Bid ID

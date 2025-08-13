@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.lang.NonNull;
@@ -34,20 +33,25 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   private static final String findAllSQL = """
        SELECT
            ac.id, ac.created, ac.started, ac.ends, ac.first_bid, ac.currently, ac.number_of_bids, ac.seller_id,
+           b.id, b.bidder_id, b.time_submitted, b.amount
+       FROM `auction-db`.auctions ac
+                LEFT JOIN `auction-db`.bids b on ac.id = b.auction_id
+    """;
+  private static final String findAllItemsSQL = """
+       SELECT
            ai.id, ai.name, ai.description, ai.location, ai.latitude, ai.longitude, ai.country,
            c.id, c.name,
-           ii.name, ii.description, ii.type, ii.image,
-           b.id, b.bidder_id, b.time, b.amount
-       FROM `auction-db`.auctions ac
-                INNER JOIN `auction-db`.auction_items ai on ac.id = ai.auction_id
-                INNER JOIN `auction-db`.item_categories ic ON ic.auction_item_id = ai.id
-                INNER JOIN `auction-db`.categories c ON c.id = ic.category_id
-                INNER JOIN `auction-db`.item_image ii ON ii.item_id = ai.id
-                INNER JOIN `auction-db`.bids b on ac.id = b.auction_id
+           ii.name, ii.description, ii.type, ii.image
+       FROM `auction-db`.auction_items ai on ac.id = ai.auction_id
+                LEFT JOIN `auction-db`.item_categories ic ON ic.auction_item_id = ai.id
+                LEFT JOIN `auction-db`.categories c ON c.id = ic.category_id
+                LEFT JOIN `auction-db`.item_image ii ON ii.item_id = ai.id
     """;
+
   private static final String findByIdClauseSQL = " WHERE ac.id = ?";
   private static final String insertBidSQL = "INSERT INTO bids (auction_id, bidder_id, time_submitted, amount) VALUES (?,?,?,?)";
   private final JdbcTemplate jdbcTemplate;
+  private final AuctionEntityResultSetExtractor extractor;
 
   public long save(final @NonNull AuctionEntity entity) {
 
@@ -119,22 +123,18 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   }
 
   @Override
-  public Optional<AuctionEntity> findById(long id) {
+  public Optional<AuctionEntity> findById(final long id, final boolean fetchItems) {
     try {
-      AuctionEntity entity = jdbcTemplate.queryForObject(
-        findAllSQL + findByIdClauseSQL,
-        new BeanPropertyRowMapper<>(AuctionEntity.class),
-        id
-      );
-      return Optional.ofNullable(entity);
+      final List<AuctionEntity> l = jdbcTemplate.query(findAllSQL + findByIdClauseSQL, extractor, id);
+      return Optional.ofNullable(l == null || l.isEmpty() ? null : l.getFirst());
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
   }
 
   @Override
-  public List<AuctionEntity> findAll() {
-    return jdbcTemplate.queryForList(findAllSQL, AuctionEntity.class);
+  public List<AuctionEntity> findAll(final boolean fetchItems) {
+    return jdbcTemplate.query(findAllSQL, extractor);
   }
 
   @Override

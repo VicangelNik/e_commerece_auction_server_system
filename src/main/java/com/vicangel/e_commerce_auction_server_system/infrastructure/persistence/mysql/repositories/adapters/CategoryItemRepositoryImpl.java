@@ -18,9 +18,11 @@ import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCod
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.ItemCategoryEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.CategoryItemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryItemRepositoryImpl implements CategoryItemRepository {
 
   private static final String findByIdSQL = "SELECT * FROM categories WHERE id = ?";
@@ -54,6 +56,7 @@ public class CategoryItemRepositoryImpl implements CategoryItemRepository {
         id
       ));
     } catch (EmptyResultDataAccessException e) {
+      log.error(e.getMessage(), e);
       return Optional.empty();
     }
   }

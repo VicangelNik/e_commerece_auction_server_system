@@ -21,9 +21,11 @@ import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCod
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.UserEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class UserRepositoryImpl implements UserRepository {
 
   private static final String findByIdSQL = "SELECT * FROM users WHERE id = ?";
@@ -74,6 +76,7 @@ public class UserRepositoryImpl implements UserRepository {
                                                              new UserEntityRowMapper(),
                                                              id));
     } catch (EmptyResultDataAccessException e) {
+      log.error(e.getMessage(), e);
       return Optional.empty();
     }
   }
