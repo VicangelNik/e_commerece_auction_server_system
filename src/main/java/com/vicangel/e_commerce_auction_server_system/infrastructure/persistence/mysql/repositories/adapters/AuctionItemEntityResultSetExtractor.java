@@ -4,48 +4,48 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.AuctionItemEntity;
-import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.ItemCategoryEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.ItemImageEntity;
 
 @Component
-public class AuctionItemEntityResultSetExtractor implements ResultSetExtractor<AuctionItemEntity> {
+public class AuctionItemEntityResultSetExtractor implements ResultSetExtractor<List<AuctionItemEntity>> {
 
   @Override
-  public AuctionItemEntity extractData(ResultSet rs) throws DataAccessException, SQLException {
+  public List<AuctionItemEntity> extractData(final ResultSet rs) throws SQLException {
 
     Map<Long, AuctionItemEntity> auctionItemEntityMap = new HashMap<>();
 
     while (rs.next()) {
-      final Long auctionItemEntityID = rs.getLong("ai.id");
+      final Long itemID = rs.getLong("ai.id");
 
-      if (auctionItemEntityMap.containsKey(auctionItemEntityID)) { // auction item already exists
-        final AuctionItemEntity auctionItemEntity = auctionItemEntityMap.get(auctionItemEntityID);
-        addCategoryToItem(rs, auctionItemEntity);
+      if (auctionItemEntityMap.containsKey(itemID)) { // auction item already exists
+        final AuctionItemEntity entity = auctionItemEntityMap.get(itemID);
+        addCategoryToItem(rs, entity);
+        auctionItemEntityMap.put(itemID, entity);
       } else { // new auction item entry
 
-        final Long imageID = rs.getObject("ii.item_id", Long.class);
+        final String imageName = rs.getString("im.name");  // image name can not be null if item has image
         ItemImageEntity image = null;
 
-        if (imageID != null) {
+        if (imageName != null) {
           image = new ItemImageEntity(
-            imageID,
-            rs.getString("ii.name"),
-            rs.getString("ii.description"),
-            rs.getString("ii.type"),
-            rs.getBytes("ii.image")
+            itemID,
+            imageName,
+            rs.getString("im.description"),
+            rs.getString("im.type"),
+            rs.getBytes("im.image")
           );
         }
 
         final var entity = AuctionItemEntity.builder()
-          .id(auctionItemEntityID)
-          .auctionId(rs.getLong("ai.auction_id"))
+          .id(itemID)
           .name(rs.getString("ai.name"))
           .description(rs.getString("ai.description"))
           .location(rs.getString("ai.location"))
@@ -58,21 +58,17 @@ public class AuctionItemEntityResultSetExtractor implements ResultSetExtractor<A
 
         addCategoryToItem(rs, entity);
 
-        auctionItemEntityMap.put(auctionItemEntityID, entity);
+        auctionItemEntityMap.put(itemID, entity);
       }
     }
-    return auctionItemEntityMap.values().stream().findFirst().orElse(null);
+    return auctionItemEntityMap.values().stream().toList();
   }
 
-  private void addCategoryToItem(ResultSet rs, AuctionItemEntity entity) throws SQLException {
-    final Long categoryID = rs.getObject("c.id", Long.class); // might be null
+  private void addCategoryToItem(@NonNull final ResultSet rs,
+                                 @NonNull final AuctionItemEntity entity) throws SQLException {
+    final Long categoryID = rs.getObject("ct.id", Long.class); // might be null
     if (categoryID != null) {
-      final var category = new ItemCategoryEntity(
-        categoryID,
-        rs.getString("c.name"),
-        rs.getString("c.description")
-      );
-      entity.categories().add(category);
+      entity.categories().add(categoryID);
     }
   }
 }

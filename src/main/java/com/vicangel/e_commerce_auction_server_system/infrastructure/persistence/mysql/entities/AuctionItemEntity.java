@@ -13,6 +13,6 @@ public record AuctionItemEntity(Long id,
                                 Double latitude,
                                 Double longitude,
                                 String country,
-                                Set<ItemCategoryEntity> categories,
+                                Set<Long> categories,
                                 ItemImageEntity image) {
 }

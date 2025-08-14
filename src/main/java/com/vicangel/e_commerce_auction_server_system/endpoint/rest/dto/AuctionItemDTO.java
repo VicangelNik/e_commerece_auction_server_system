@@ -13,6 +13,6 @@ public record AuctionItemDTO(Long id,
                              Double latitude,
                              Double longitude,
                              String country,
-                             Set<ItemCategoryDTO> categories,
+                             Set<Long> categories,
                              ItemImageDTO image) {
 }

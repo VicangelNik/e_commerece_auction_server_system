@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,12 +41,12 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   private static final String findItemByIdSQL = """
        SELECT
            ai.id, ai.name, ai.description, ai.location, ai.latitude, ai.longitude, ai.country,
-           c.id, c.name, c.description
-           ii.name, ii.description, ii.type, ii.image
-       FROM `auction-db`.auction_items ai on ac.id = ai.auction_id
-                LEFT JOIN `auction-db`.item_categories ic ON ic.auction_item_id = ai.id
-                LEFT JOIN `auction-db`.categories c ON c.id = ic.category_id
-                LEFT JOIN `auction-db`.item_image ii ON ii.item_id = ai.id
+           ct.id, ct.name, ct.description,
+           im.name, im.description, im.type, im.image
+       FROM `auction-db`.auction_items ai
+           LEFT JOIN `auction-db`.item_image im ON im.item_id = ai.id
+           LEFT JOIN `auction-db`.item_categories ic ON ic.auction_item_id = ai.id
+           LEFT JOIN `auction-db`.categories ct ON ct.id = ic.category_id
        WHERE ai.auction_id = ?
     """;
 
@@ -53,6 +54,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   private static final String insertBidSQL = "INSERT INTO bids (auction_id, bidder_id, time_submitted, amount) VALUES (?,?,?,?)";
   private final JdbcTemplate jdbcTemplate;
   private final AuctionEntityResultSetExtractor extractor;
+  private final AuctionItemEntityResultSetExtractor extractorItem;
 
   public long save(final @NonNull AuctionEntity entity) {
 
@@ -127,7 +129,18 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   public Optional<AuctionEntity> findById(final long id, final boolean fetchItems) {
     try {
       final List<AuctionEntity> l = jdbcTemplate.query(findAllSQL + findByIdClauseSQL, extractor, id);
-      return Optional.ofNullable(l == null || l.isEmpty() ? null : l.getFirst());
+
+      if (l == null || l.isEmpty()) return Optional.empty();
+
+      final AuctionEntity entity = l.getFirst();
+
+      if (fetchItems) {
+        final List<AuctionItemEntity> items = jdbcTemplate.query(findItemByIdSQL, extractorItem, id);
+        if (items != null && !items.isEmpty()) {
+          entity.auctionItems().addAll(items);
+        }
+      }
+      return Optional.of(entity);
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
@@ -135,7 +148,19 @@ public class AuctionRepositoryImpl implements AuctionRepository {
 
   @Override
   public List<AuctionEntity> findAll(final boolean fetchItems) {
-    return jdbcTemplate.query(findAllSQL, extractor);
+    List<AuctionEntity> l = jdbcTemplate.query(findAllSQL, extractor);
+
+    if (l == null) return Collections.emptyList();
+
+    l.forEach(entity -> {
+      if (fetchItems) {
+        final List<AuctionItemEntity> items = jdbcTemplate.query(findItemByIdSQL, extractorItem, entity.id());
+        if (items != null && !items.isEmpty()) {
+          entity.auctionItems().addAll(items);
+        }
+      }
+    });
+    return l;
   }
 
   @Override
