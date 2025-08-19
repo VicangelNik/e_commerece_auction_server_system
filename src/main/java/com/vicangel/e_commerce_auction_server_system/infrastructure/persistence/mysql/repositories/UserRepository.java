@@ -12,9 +12,9 @@ public interface UserRepository {
    */
   long insertUser(UserEntity entity);
 
-  Optional<UserEntity> findById(long id);
+  Optional<UserEntity> findById(long id, boolean fetchAvatar);
 
-  Stream<UserEntity> findAll();
+  Stream<UserEntity> findAll(boolean fetchAvatar);
 
   /**
    *

@@ -36,16 +36,16 @@ final class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Optional<User> findById(final long id) {
+  public Optional<User> findById(final long id, final boolean fetchAvatar) {
     return repository
-      .findById(id)
+      .findById(id, fetchAvatar)
       .map(mapper::mapEntityToModel);
   }
 
   @Override
-  public List<User> findAll() {
+  public List<User> findAll(final boolean fetchAvatar) {
     return repository
-      .findAll()
+      .findAll(fetchAvatar)
       .map(mapper::mapEntityToModel)
       .toList();
   }
@@ -53,7 +53,7 @@ final class UserServiceImpl implements UserService {
   @Override
   public void updateUser(final long id, final User updatedUser) {
 
-    final User userToUpdate = repository.findById(id)
+    final User userToUpdate = repository.findById(id, false)
       .map(mapper::mapEntityToModel)
       .map(existingUser -> User.builder().id(existingUser.id())
         .created(existingUser.created())
@@ -68,6 +68,7 @@ final class UserServiceImpl implements UserService {
         .sellerRating(updatedUser.sellerRating() != null ? updatedUser.sellerRating() : existingUser.sellerRating())
         .location(updatedUser.location() != null ? updatedUser.location() : existingUser.location())
         .country(updatedUser.country() != null ? updatedUser.country() : existingUser.country())
+        .avatar(updatedUser.avatar() != null ? updatedUser.avatar() : existingUser.avatar())
         .build())
       .orElseThrow(() -> new UserIdNotFoundException("User not found with id: " + id));
 

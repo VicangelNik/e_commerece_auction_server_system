@@ -152,14 +152,14 @@ public class AuctionRepositoryImpl implements AuctionRepository {
 
     if (l == null) return Collections.emptyList();
 
-    l.forEach(entity -> {
-      if (fetchItems) {
+    if (fetchItems) {
+      l.forEach(entity -> {
         final List<AuctionItemEntity> items = jdbcTemplate.query(findItemByIdSQL, extractorItem, entity.id());
         if (items != null && !items.isEmpty()) {
           entity.auctionItems().addAll(items);
         }
-      }
-    });
+      });
+    }
     return l;
   }
 

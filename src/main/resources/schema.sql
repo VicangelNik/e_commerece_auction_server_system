@@ -1,4 +1,5 @@
-CREATE TABLE users (
+CREATE TABLE users
+(
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     created       DATETIME NOT NULL, -- Ημερομηνία δημιουργίας εγγραφής (συστημικό)
     username      VARCHAR(100),
@@ -11,10 +12,36 @@ CREATE TABLE users (
     bidder_rating INT,               -- το rating του χρήστη ως bidder
     seller_rating INT,               -- το rating του χρήστη ως seller
     location      VARCHAR(100),
-    country       VARCHAR(3)         -- 3-letter country codes stored
+    country       VARCHAR(3),        -- 3-letter country codes stored
+    avatar        MEDIUMBLOB         -- https://www.dbvis.com/thetable/blob-data-type-everything-you-can-do-with-it/#:~:text=BLOB%20%3A%20Can%20store%20up%20to,to%204%2C294%2C967%2C295%20bytes%20of%20data.
 );
 
-CREATE TABLE auctions (
+CREATE TABLE roles
+(
+    name        ENUM ('SELLER','BIDDER','GUEST','ADMIN') PRIMARY KEY,
+    description VARCHAR(100)
+);
+
+CREATE TABLE user_roles -- many-to-many relationship
+(
+    user_id   BIGINT                                   NOT NULL,
+    role_name ENUM ('SELLER','BIDDER','GUEST','ADMIN') NOT NULL,
+    PRIMARY KEY (user_id, role_name),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (role_name) REFERENCES roles (name) ON DELETE CASCADE
+);
+
+CREATE TABLE item_categories
+( -- many-to-many relationship
+    auction_item_id BIGINT NOT NULL,
+    category_id     BIGINT NOT NULL,
+    PRIMARY KEY (auction_item_id, category_id),
+    FOREIGN KEY (auction_item_id) REFERENCES auction_items (id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
+);
+
+CREATE TABLE auctions
+(
     id             BIGINT AUTO_INCREMENT PRIMARY KEY, -- Μοναδικό id της δημοπρασίας
     created        DATETIME       NOT NULL,           -- Ημερομηνία δημιουργίας εγγραφής (συστημικό)
     started        DATETIME       NULL,               -- Χρόνος έναρξης της δημοπρασίας
@@ -23,10 +50,11 @@ CREATE TABLE auctions (
     currently      DECIMAL(10, 2) NULL,               -- Η τρέχουσα καλύτερη προσφορά σε δολάρια. Είναι πάντοτε ίση με την υψηλότερη προσφορά ή με το First_Bid αν δεν έχουν υποβληθεί προσφορές
     number_of_bids INT            NOT NULL,           -- αριθμός των προσφορών / των στοιχείων προσφοράς, το οποίο ορίζεται από τον πωλητή πριν την έναρξη της δημοπρασίας
     seller_id      BIGINT         NOT NULL,           -- Ο πωλητής / δημιουργός της δημοπρασίας
-    FOREIGN KEY (seller_id) REFERENCES users(id)
+    FOREIGN KEY (seller_id) REFERENCES users (id)
 );
 
-CREATE TABLE auction_items (
+CREATE TABLE auction_items
+(
     id          BIGINT AUTO_INCREMENT PRIMARY KEY, -- Μοναδικό id για το αντικείμενο που τίθεται σε δημοπρασία
     auction_id  BIGINT,
     name        VARCHAR(255) NOT NULL,             -- Μια σύντομη ονομασία που χρησιμοποιείται ως περιγραφή της δημοπρασίας
@@ -35,10 +63,11 @@ CREATE TABLE auction_items (
     latitude    DECIMAL(10, 7),                    -- Προαιρετικά τα attributes Latitude και Longitude του στοιχείου Location ορίζουν τις γεωγραφικές συντεταγμένες του αντικειμένου.
     longitude   DECIMAL(10, 7),
     country     VARCHAR(3),                        -- 3-letter country codes stored
-    FOREIGN KEY (auction_id) REFERENCES auctions(id)
+    FOREIGN KEY (auction_id) REFERENCES auctions (id)
 );
 
-CREATE TABLE item_image (              -- one-to-one relationship
+CREATE TABLE item_image
+(                                      -- one-to-one relationship
     item_id     BIGINT       NOT NULL,
     name        VARCHAR(255) NOT NULL, -- Μια σύντομη ονομασία που χρησιμοποιείται ως περιγραφή της δημοπρασίας
     description VARCHAR(255),          -- Η πλήρης περιγραφή του αντικειμένου,
@@ -47,26 +76,29 @@ CREATE TABLE item_image (              -- one-to-one relationship
     PRIMARY KEY (item_id)
 );
 
-CREATE TABLE categories (
+CREATE TABLE categories
+(
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(255)
 );
 
-CREATE TABLE item_categories ( -- many-to-many relationship
+CREATE TABLE item_categories
+( -- many-to-many relationship
     auction_item_id BIGINT NOT NULL,
     category_id     BIGINT NOT NULL,
     PRIMARY KEY (auction_item_id, category_id),
-    FOREIGN KEY (auction_item_id) REFERENCES auction_items(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+    FOREIGN KEY (auction_item_id) REFERENCES auction_items (id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
 );
 
-CREATE TABLE bids (                         -- προσφορές
+CREATE TABLE bids
+(                                           -- προσφορές
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     auction_id     BIGINT         NOT NULL, -- η δημοπρασία για την οποία κάνει τη προσφορά
     bidder_id      BIGINT         NOT NULL, -- indicates the user id
     time_submitted DATETIME       NOT NULL, -- Χρόνος υποβολής της προσφοράς. Πρέπει να είναι μεταγενέστερο του χρόνου έναρξης της ψηφοφορίας και προγενέστερο του χρόνου λήξης της. Ένας χρήστης μπορεί να υποβάλλει πολλαπλές προσφορές σε μια δημοπρασία αλλά σε διαφορετικό χρόνο.
     amount         DECIMAL(10, 2) NOT NULL, -- το ποσό της προσφοράς
-    FOREIGN KEY (auction_id) REFERENCES auctions(id),
-    FOREIGN KEY (bidder_id) REFERENCES users(id)
+    FOREIGN KEY (auction_id) REFERENCES auctions (id),
+    FOREIGN KEY (bidder_id) REFERENCES users (id)
 );

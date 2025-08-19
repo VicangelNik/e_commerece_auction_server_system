@@ -1,6 +1,7 @@
 package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities;
 
 import java.time.Instant;
+import java.util.Set;
 
 import lombok.Builder;
 
@@ -17,5 +18,7 @@ public record UserEntity(Long id,
                          Integer bidderRating,
                          Integer sellerRating,
                          String location,
-                         String country) {
+                         String country,
+                         Set<Long> roles,
+                         String avatar) {
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveOrUpdatedUserRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
@@ -43,11 +44,11 @@ public interface UserOpenAPI {
           )})}),
     @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(hidden = true)))
   })
-  ResponseEntity<IdResponse> addUser(SaveOrUpdatedUserRequest request);
+  ResponseEntity<IdResponse> addUser(SaveOrUpdatedUserRequest request, MultipartFile avatar);
 
-  ResponseEntity<UserResponse> findById(@Valid @Positive long id);
+  ResponseEntity<UserResponse> findById(@Valid @Positive long id, boolean fetchAvatar);
 
-  ResponseEntity<List<UserResponse>> findAll();
+  ResponseEntity<List<UserResponse>> findAll(boolean fetchAvatar);
 
-  ResponseEntity<Void> updateUser(@Valid @Positive long id, SaveOrUpdatedUserRequest request);
+  ResponseEntity<Void> updateUser(@Valid @Positive long id, SaveOrUpdatedUserRequest request, MultipartFile avatar);
 }

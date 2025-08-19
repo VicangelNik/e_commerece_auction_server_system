@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.UserService;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.UserOpenAPI;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -37,20 +39,21 @@ class UserController implements UserOpenAPI {
   private final UserEndpointMapper mapper;
   private final UserService service;
 
-  @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/add", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<IdResponse> addUser(@Validated(SaveUser.class) @RequestBody final SaveOrUpdatedUserRequest request) {
+  public ResponseEntity<IdResponse> addUser(@Validated(SaveUser.class) @RequestPart("request") final SaveOrUpdatedUserRequest request,
+                                            @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
 
-    final long result = service.insertUser(mapper.mapRequestToModel(request));
+    final long result = service.insertUser(mapper.mapRequestToModel(request, avatar));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<UserResponse> findById(@PathVariable final long id) {
+  public ResponseEntity<UserResponse> findById(@PathVariable final long id, final boolean fetchAvatar) {
 
-    Optional<UserResponse> response = service.findById(id).map(mapper::mapModelToResponse);
+    Optional<UserResponse> response = service.findById(id, fetchAvatar).map(mapper::mapModelToResponse);
 
     return response.map(r -> ResponseEntity.status(HttpStatus.OK).body(r))
       .orElseGet(() -> ResponseEntity.notFound().build());
@@ -58,21 +61,22 @@ class UserController implements UserOpenAPI {
 
   @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<List<UserResponse>> findAll() {
+  public ResponseEntity<List<UserResponse>> findAll(final boolean fetchAvatar) {
 
-    final List<UserResponse> response = service.findAll().stream().map(mapper::mapModelToResponse).toList();
+    final List<UserResponse> response = service.findAll(fetchAvatar).stream().map(mapper::mapModelToResponse).toList();
 
     if (response.isEmpty()) return ResponseEntity.notFound().build();
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
-  @PutMapping(value = "/{id}", consumes = APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{id}", consumes = MULTIPART_FORM_DATA_VALUE)
   @Override
   public ResponseEntity<Void> updateUser(@PathVariable final long id,
-                                         @Validated(UpdateUser.class) @RequestBody final SaveOrUpdatedUserRequest request) {
+                                         @Validated(UpdateUser.class) @RequestPart final SaveOrUpdatedUserRequest request,
+                                         @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
 
-    service.updateUser(id, mapper.mapRequestToModel(request));
+    service.updateUser(id, mapper.mapRequestToModel(request, avatar));
 
     return ResponseEntity.status(HttpStatus.OK).build();
   }

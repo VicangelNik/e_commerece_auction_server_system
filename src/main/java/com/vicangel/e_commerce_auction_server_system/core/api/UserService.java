@@ -9,9 +9,9 @@ public interface UserService {
 
   long insertUser(User user);
 
-  Optional<User> findById(long id);
+  Optional<User> findById(long id, boolean fetchAvatar);
 
-  List<User> findAll();
+  List<User> findAll(boolean fetchAvatar);
 
   void updateUser(long id, User user);
 }

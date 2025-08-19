@@ -13,5 +13,5 @@ public interface UserCoreMapper {
   @Mapping(source = "created", target = "created", defaultExpression = "java(java.time.Instant.now())")
   UserEntity mapModelToEntity(User user);
 
-  User mapEntityToModel(UserEntity category);
+  User mapEntityToModel(UserEntity entity);
 }

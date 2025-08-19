@@ -28,18 +28,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserRepositoryImpl implements UserRepository {
 
-  private static final String findByIdSQL = "SELECT * FROM users WHERE id = ?";
+  private static final String FIND_BY_ID_SQL = "SELECT * FROM users WHERE id = ?";
+  private static final String FIND_NO_AVATAR_SQL = "SELECT id, created, username, password, name, surname, email, phone, afm, bidder_rating, seller_rating, location, country FROM users";
   private static final String insertSQL = """
     INSERT INTO `auction-db`.users (created, username, password, name, surname, email, phone, afm, bidder_rating,
-                                    seller_rating, location, country) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+                                    seller_rating, location, country, avatar) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
     """;
-  private static final String findAllSQL = "SELECT * FROM users";
+  private static final String FIND_ALL_SQL = "SELECT * FROM users";
   private static final String updateSQL = """
     UPDATE `auction-db`.users
     SET username = ?, password = ?, name = ?, surname = ?, email = ?, phone = ?,
-        afm = ?, bidder_rating = ?, seller_rating = ?, location = ?, country = ?
+        afm = ?, bidder_rating = ?, seller_rating = ?, location = ?, country = ?,
+        avatar = ?
     WHERE id = ?;
     """;
+  private static final String ADD_USER_ROLE_SQL = "INSERT INTO user_roles (user_id, role_name) VALUES (?, ?)";
+  private static final String WHERE_ID_SQL = " WHERE id = ?";
   private final JdbcTemplate jdbcTemplate;
 
   @Override
@@ -61,18 +65,30 @@ public class UserRepositoryImpl implements UserRepository {
       ps.setObject(10, entity.sellerRating(), Types.INTEGER);
       ps.setObject(11, entity.location(), Types.VARCHAR);
       ps.setObject(12, entity.country(), Types.VARCHAR);
+      ps.setObject(13, entity.avatar(), Types.BLOB);
       return ps;
     }, keyHolder);
 
     if (keyHolder.getKey() == null) return ErrorCodes.SQL_ERROR.getCode();
 
-    return keyHolder.getKey().longValue();
+    final long userId = keyHolder.getKey().longValue();
+
+    entity.roles()
+      .forEach(roleId -> {
+
+        int addUserRoleResult = jdbcTemplate.update(ADD_USER_ROLE_SQL, userId, roleId);
+
+        if (addUserRoleResult != 1) log.error("Role {} could not be added to User {}", roleId, userId);
+      });
+
+    return userId;
   }
 
   @Override
-  public Optional<UserEntity> findById(final long id) {
+  public Optional<UserEntity> findById(final long id, final boolean fetchAvatar) {
+    final String sql = fetchAvatar ? FIND_BY_ID_SQL : FIND_NO_AVATAR_SQL + WHERE_ID_SQL;
     try {
-      return Optional.ofNullable(jdbcTemplate.queryForObject(findByIdSQL,
+      return Optional.ofNullable(jdbcTemplate.queryForObject(sql,
                                                              new UserEntityRowMapper(),
                                                              id));
     } catch (EmptyResultDataAccessException e) {
@@ -82,12 +98,13 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public Stream<UserEntity> findAll() { // maybe check this https://github.com/spring-projects/spring-framework/issues/27988
-    return jdbcTemplate.queryForStream(findAllSQL, new UserEntityRowMapper());
+  public Stream<UserEntity> findAll(final boolean fetchAvatar) { // maybe check this https://github.com/spring-projects/spring-framework/issues/27988
+    final String sql = fetchAvatar ? FIND_ALL_SQL : FIND_NO_AVATAR_SQL;
+    return jdbcTemplate.queryForStream(sql, new UserEntityRowMapper());
   }
 
   @Override
-  public int updateUser(UserEntity userToUpdate) {
+  public int updateUser(final UserEntity userToUpdate) {
     return jdbcTemplate.update(updateSQL,
                                userToUpdate.username(),
                                userToUpdate.password(),
@@ -100,6 +117,7 @@ public class UserRepositoryImpl implements UserRepository {
                                userToUpdate.sellerRating(),
                                userToUpdate.location(),
                                userToUpdate.country(),
+                               userToUpdate.avatar(),
                                userToUpdate.id());
   }
 
