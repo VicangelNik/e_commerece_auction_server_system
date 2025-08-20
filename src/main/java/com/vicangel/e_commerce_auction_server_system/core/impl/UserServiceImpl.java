@@ -2,6 +2,7 @@ package com.vicangel.e_commerce_auction_server_system.core.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ final class UserServiceImpl implements UserService {
   public List<User> findAll(final boolean fetchAvatar) {
     return repository
       .findAll(fetchAvatar)
+      .stream()
       .map(mapper::mapEntityToModel)
       .toList();
   }
@@ -53,7 +55,7 @@ final class UserServiceImpl implements UserService {
   @Override
   public void updateUser(final long id, final User updatedUser) {
 
-    final User userToUpdate = repository.findById(id, false)
+    final User userToUpdate = repository.findById(id, true)
       .map(mapper::mapEntityToModel)
       .map(existingUser -> User.builder().id(existingUser.id())
         .created(existingUser.created())
@@ -68,6 +70,7 @@ final class UserServiceImpl implements UserService {
         .sellerRating(updatedUser.sellerRating() != null ? updatedUser.sellerRating() : existingUser.sellerRating())
         .location(updatedUser.location() != null ? updatedUser.location() : existingUser.location())
         .country(updatedUser.country() != null ? updatedUser.country() : existingUser.country())
+        .roles(getOnlyNewRoles(updatedUser.roles(), existingUser.roles()))
         .avatar(updatedUser.avatar() != null ? updatedUser.avatar() : existingUser.avatar())
         .build())
       .orElseThrow(() -> new UserIdNotFoundException("User not found with id: " + id));
@@ -75,5 +78,17 @@ final class UserServiceImpl implements UserService {
     final int rowsAffected = repository.updateUser(mapper.mapModelToEntity(userToUpdate));
 
     if (rowsAffected == 0) throw new UserException("Updating user failed with id: " + id);
+  }
+
+  private static Set<String> getOnlyNewRoles(final Set<String> rolesNew, final Set<String> rolesExisting) {
+
+    if (rolesExisting == null || rolesExisting.isEmpty()) {
+      throw new UserException("User entity is on an illegal state, roles cannot be empty.");
+    }
+    if (rolesNew == null || rolesNew.isEmpty()) return Set.of();
+
+    rolesNew.removeAll(rolesExisting);
+
+    return rolesNew;
   }
 }

@@ -19,6 +19,6 @@ public record UserEntity(Long id,
                          Integer sellerRating,
                          String location,
                          String country,
-                         Set<Long> roles,
+                         Set<String> roles,
                          String avatar) {
 }

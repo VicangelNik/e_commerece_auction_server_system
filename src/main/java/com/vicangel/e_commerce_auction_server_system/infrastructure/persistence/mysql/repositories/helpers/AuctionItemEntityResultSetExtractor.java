@@ -1,4 +1,4 @@
-package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.adapters;
+package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.helpers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

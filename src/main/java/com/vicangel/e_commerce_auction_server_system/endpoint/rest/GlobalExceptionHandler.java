@@ -13,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.HandlerMethod;
 
 import com.vicangel.e_commerce_auction_server_system.core.error.ItemCategoryException;
+import com.vicangel.e_commerce_auction_server_system.core.error.RoleNotValidException;
 import com.vicangel.e_commerce_auction_server_system.core.error.UserException;
 import com.vicangel.e_commerce_auction_server_system.core.error.UserIdNotFoundException;
 import jakarta.validation.ConstraintViolationException;
@@ -46,16 +48,12 @@ public class GlobalExceptionHandler {
     return buildResponseEntity(BAD_REQUEST, apiError);
   }
 
-  @ExceptionHandler(value = {SQLIntegrityConstraintViolationException.class})
-  protected ResponseEntity<Object> handleSQLIntegrityConstraintViolationException(
-    SQLIntegrityConstraintViolationException ex) {
-    log.error(ex.getMessage(), ex);
-    final var apiError = new ApiError(List.of(ex.getMessage()));
-    return buildResponseEntity(BAD_REQUEST, apiError);
-  }
-
-  @ExceptionHandler(value = {UserIdNotFoundException.class})
-  protected ResponseEntity<Object> handleIdNotFoundException(RuntimeException ex) {
+  @ExceptionHandler(value = {
+    SQLIntegrityConstraintViolationException.class,
+    RoleNotValidException.class,
+    UserIdNotFoundException.class})
+  protected ResponseEntity<Object> handleRequestInputException(
+    Exception ex) {
     log.error(ex.getMessage(), ex);
     final var apiError = new ApiError(List.of(ex.getMessage()));
     return buildResponseEntity(BAD_REQUEST, apiError);
@@ -93,5 +91,23 @@ public class GlobalExceptionHandler {
   }
 
   private record ApiError(List<String> errors) {
+  }
+
+  @ExceptionHandler({Exception.class})
+  protected ResponseEntity<Object> handleException(Exception ex, HandlerMethod handlerMethod) {
+    final String errorMsg =
+      String.format(
+        "Exception occurred in method: %s of class: %s, Exception message: %s",
+        handlerMethod.getMethod().getName(),
+        handlerMethod.getBeanType().getName(),
+        ex.getMessage()
+      );
+    log.error(errorMsg, ex);
+
+    if (ex.getMessage() != null) {
+      final var apiError = new ApiError(List.of(ex.getMessage()));
+      return buildResponseEntity(INTERNAL_SERVER_ERROR, apiError);
+    }
+    return new ResponseEntity<>(INTERNAL_SERVER_ERROR);
   }
 }

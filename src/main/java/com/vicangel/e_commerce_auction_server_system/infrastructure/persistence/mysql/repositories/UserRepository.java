@@ -1,5 +1,6 @@
 package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -14,7 +15,7 @@ public interface UserRepository {
 
   Optional<UserEntity> findById(long id, boolean fetchAvatar);
 
-  Stream<UserEntity> findAll(boolean fetchAvatar);
+  List<UserEntity> findAll(boolean fetchAvatar);
 
   /**
    *

@@ -1,8 +1,7 @@
-package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.adapters;
+package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.helpers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,8 +15,10 @@ import org.springframework.stereotype.Component;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.AuctionEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.BidEntity;
 
+import static com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.helpers.RepoUtils.toInstant;
+
 @Component
-final class AuctionEntityResultSetExtractor implements ResultSetExtractor<List<AuctionEntity>> {
+public final class AuctionEntityResultSetExtractor implements ResultSetExtractor<List<AuctionEntity>> {
 
   @Override
   public List<AuctionEntity> extractData(ResultSet rs) throws SQLException {
@@ -65,11 +66,5 @@ final class AuctionEntityResultSetExtractor implements ResultSetExtractor<List<A
       );
       entity.bids().add(bidEntity);
     }
-  }
-
-  private Instant toInstant(final @NonNull ResultSet rs,
-                            final @NonNull String column) throws SQLException {
-    final var ts = rs.getTimestamp(column);
-    return ts != null ? ts.toInstant() : null;
   }
 }

@@ -20,5 +20,5 @@ public record SaveOrUpdatedUserRequest(@NotBlank(groups = SaveUser.class) String
                                        @Positive(groups = {SaveUser.class, UpdateUser.class}) Integer sellerRating,
                                        String location,
                                        String country,
-                                       @NotEmpty(groups = SaveUser.class) Set<Long> roles) {
+                                       @NotEmpty(groups = SaveUser.class) Set<String> roles) {
 }

@@ -1,3 +1,5 @@
+use `auction-db`;
+
 INSERT INTO roles (name, description)
 VALUES ('SELLER', 'A user that can set products for auction'),
        ('BIDDER', 'A user that can bid on an auction'),

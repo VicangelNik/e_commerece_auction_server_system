@@ -2,24 +2,24 @@
 package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.adapters;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
+import com.vicangel.e_commerce_auction_server_system.core.error.RoleNotValidException;
 import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCodes;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.UserEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.UserRepository;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.helpers.UserEntityResultSetExtractor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,14 +28,31 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserRepositoryImpl implements UserRepository {
 
-  private static final String FIND_BY_ID_SQL = "SELECT * FROM users WHERE id = ?";
-  private static final String FIND_NO_AVATAR_SQL = "SELECT id, created, username, password, name, surname, email, phone, afm, bidder_rating, seller_rating, location, country FROM users";
   private static final String insertSQL = """
     INSERT INTO `auction-db`.users (created, username, password, name, surname, email, phone, afm, bidder_rating,
                                     seller_rating, location, country, avatar) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
     """;
-  private static final String FIND_ALL_SQL = "SELECT * FROM users";
-  private static final String updateSQL = """
+  private static final String FIND_ALL_SQL = """
+    SELECT u.id,
+           u.created,
+           u.username,
+           u.password,
+           u.name,
+           u.surname,
+           u.email,
+           u.phone,
+           u.afm,
+           u.bidder_rating,
+           u.seller_rating,
+           u.location,
+           u.country,
+           u.avatar,
+           r.name
+    FROM `auction-db`.users u
+             INNER JOIN `auction-db`.user_roles ur ON ur.user_id = u.id
+             INNER JOIN `auction-db`.roles r ON r.name = ur.role_name
+    """;
+  private static final String UPDATE_SQL = """
     UPDATE `auction-db`.users
     SET username = ?, password = ?, name = ?, surname = ?, email = ?, phone = ?,
         afm = ?, bidder_rating = ?, seller_rating = ?, location = ?, country = ?,
@@ -44,7 +61,9 @@ public class UserRepositoryImpl implements UserRepository {
     """;
   private static final String ADD_USER_ROLE_SQL = "INSERT INTO user_roles (user_id, role_name) VALUES (?, ?)";
   private static final String WHERE_ID_SQL = " WHERE id = ?";
+
   private final JdbcTemplate jdbcTemplate;
+  private final UserEntityResultSetExtractor extractor;
 
   @Override
   public long insertUser(@NonNull final UserEntity entity) {
@@ -86,11 +105,17 @@ public class UserRepositoryImpl implements UserRepository {
 
   @Override
   public Optional<UserEntity> findById(final long id, final boolean fetchAvatar) {
-    final String sql = fetchAvatar ? FIND_BY_ID_SQL : FIND_NO_AVATAR_SQL + WHERE_ID_SQL;
+    String sql = FIND_ALL_SQL + WHERE_ID_SQL;
+
+    if (!fetchAvatar) {
+      sql = sql.replace("u.avatar,", ""); // exclude fetching image
+    }
+    final List<UserEntity> l = jdbcTemplate.query(sql, extractor, id);
+
+    if (l == null || l.isEmpty()) return Optional.empty();
+
     try {
-      return Optional.ofNullable(jdbcTemplate.queryForObject(sql,
-                                                             new UserEntityRowMapper(),
-                                                             id));
+      return Optional.of(l.getFirst());
     } catch (EmptyResultDataAccessException e) {
       log.error(e.getMessage(), e);
       return Optional.empty();
@@ -98,14 +123,27 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public Stream<UserEntity> findAll(final boolean fetchAvatar) { // maybe check this https://github.com/spring-projects/spring-framework/issues/27988
-    final String sql = fetchAvatar ? FIND_ALL_SQL : FIND_NO_AVATAR_SQL;
-    return jdbcTemplate.queryForStream(sql, new UserEntityRowMapper());
+  public List<UserEntity> findAll(final boolean fetchAvatar) { // maybe check this https://github.com/spring-projects/spring-framework/issues/27988
+    String sql = FIND_ALL_SQL;
+    if (!fetchAvatar) {
+      sql = sql.replace("u.avatar,", ""); // exclude fetching image
+    }
+    return jdbcTemplate.query(sql, extractor);
   }
 
   @Override
   public int updateUser(final UserEntity userToUpdate) {
-    return jdbcTemplate.update(updateSQL,
+    userToUpdate.roles().forEach(roleId -> {
+      try {
+        int addUserRoleResult = jdbcTemplate.update(ADD_USER_ROLE_SQL, userToUpdate.id(), roleId);
+        if (addUserRoleResult != 1) log.error("Role {} could not be added to User {}", roleId, userToUpdate.id());
+      }catch (DataIntegrityViolationException e)
+      {
+        throw new RoleNotValidException("Role to be added for user does not exist", e);
+      }
+    });
+
+    return jdbcTemplate.update(UPDATE_SQL,
                                userToUpdate.username(),
                                userToUpdate.password(),
                                userToUpdate.name(),
@@ -119,33 +157,5 @@ public class UserRepositoryImpl implements UserRepository {
                                userToUpdate.country(),
                                userToUpdate.avatar(),
                                userToUpdate.id());
-  }
-
-  private static final class UserEntityRowMapper implements RowMapper<UserEntity> {
-
-    /**
-     * @param rs     the {@code ResultSet} to map (pre-initialized for the current row)
-     * @param rowNum the number of the current row
-     *
-     * @implNote jdbc returns 0 if written like rs.getInt as it returns primitive types but written with getObject it will return null
-     */
-    @Override
-    public UserEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-      return UserEntity.builder()
-        .id(rs.getLong("id"))
-        .created(rs.getTimestamp("created").toInstant())
-        .username(rs.getString("username"))
-        .password(rs.getString("password"))
-        .name(rs.getString("name"))
-        .surname(rs.getString("surname"))
-        .email(rs.getString("email"))
-        .phone(rs.getObject("phone", String.class))
-        .afm(rs.getObject("afm", String.class))
-        .bidderRating(rs.getObject("bidder_rating", Integer.class))
-        .sellerRating(rs.getObject("seller_rating", Integer.class))
-        .location(rs.getObject("location", String.class))
-        .country(rs.getObject("country", String.class))
-        .build();
-    }
   }
 }

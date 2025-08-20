@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,7 +52,8 @@ class UserController implements UserOpenAPI {
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<UserResponse> findById(@PathVariable final long id, final boolean fetchAvatar) {
+  public ResponseEntity<UserResponse> findById(@PathVariable final long id,
+                                               @RequestParam("fetchAvatar") final boolean fetchAvatar) {
 
     Optional<UserResponse> response = service.findById(id, fetchAvatar).map(mapper::mapModelToResponse);
 
@@ -61,7 +63,7 @@ class UserController implements UserOpenAPI {
 
   @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<List<UserResponse>> findAll(final boolean fetchAvatar) {
+  public ResponseEntity<List<UserResponse>> findAll(@RequestParam("fetchAvatar") final boolean fetchAvatar) {
 
     final List<UserResponse> response = service.findAll(fetchAvatar).stream().map(mapper::mapModelToResponse).toList();
 

@@ -1,4 +1,6 @@
-CREATE TABLE users
+use `auction-db`;
+
+CREATE TABLE IF NOT EXISTS users
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     created       DATETIME NOT NULL, -- Ημερομηνία δημιουργίας εγγραφής (συστημικό)
@@ -16,13 +18,13 @@ CREATE TABLE users
     avatar        MEDIUMBLOB         -- https://www.dbvis.com/thetable/blob-data-type-everything-you-can-do-with-it/#:~:text=BLOB%20%3A%20Can%20store%20up%20to,to%204%2C294%2C967%2C295%20bytes%20of%20data.
 );
 
-CREATE TABLE roles
+CREATE TABLE IF NOT EXISTS roles
 (
     name        ENUM ('SELLER','BIDDER','GUEST','ADMIN') PRIMARY KEY,
     description VARCHAR(100)
 );
 
-CREATE TABLE user_roles -- many-to-many relationship
+CREATE TABLE IF NOT EXISTS user_roles -- many-to-many relationship
 (
     user_id   BIGINT                                   NOT NULL,
     role_name ENUM ('SELLER','BIDDER','GUEST','ADMIN') NOT NULL,
@@ -31,16 +33,7 @@ CREATE TABLE user_roles -- many-to-many relationship
     FOREIGN KEY (role_name) REFERENCES roles (name) ON DELETE CASCADE
 );
 
-CREATE TABLE item_categories
-( -- many-to-many relationship
-    auction_item_id BIGINT NOT NULL,
-    category_id     BIGINT NOT NULL,
-    PRIMARY KEY (auction_item_id, category_id),
-    FOREIGN KEY (auction_item_id) REFERENCES auction_items (id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
-);
-
-CREATE TABLE auctions
+CREATE TABLE IF NOT EXISTS auctions
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY, -- Μοναδικό id της δημοπρασίας
     created        DATETIME       NOT NULL,           -- Ημερομηνία δημιουργίας εγγραφής (συστημικό)
@@ -53,7 +46,7 @@ CREATE TABLE auctions
     FOREIGN KEY (seller_id) REFERENCES users (id)
 );
 
-CREATE TABLE auction_items
+CREATE TABLE IF NOT EXISTS auction_items
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY, -- Μοναδικό id για το αντικείμενο που τίθεται σε δημοπρασία
     auction_id  BIGINT,
@@ -66,7 +59,7 @@ CREATE TABLE auction_items
     FOREIGN KEY (auction_id) REFERENCES auctions (id)
 );
 
-CREATE TABLE item_image
+CREATE TABLE IF NOT EXISTS item_image
 (                                      -- one-to-one relationship
     item_id     BIGINT       NOT NULL,
     name        VARCHAR(255) NOT NULL, -- Μια σύντομη ονομασία που χρησιμοποιείται ως περιγραφή της δημοπρασίας
@@ -76,14 +69,14 @@ CREATE TABLE item_image
     PRIMARY KEY (item_id)
 );
 
-CREATE TABLE categories
+CREATE TABLE IF NOT EXISTS categories
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(255)
 );
 
-CREATE TABLE item_categories
+CREATE TABLE IF NOT EXISTS item_categories
 ( -- many-to-many relationship
     auction_item_id BIGINT NOT NULL,
     category_id     BIGINT NOT NULL,
@@ -92,7 +85,16 @@ CREATE TABLE item_categories
     FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
 );
 
-CREATE TABLE bids
+CREATE TABLE IF NOT EXISTS item_categories
+( -- many-to-many relationship
+    auction_item_id BIGINT NOT NULL,
+    category_id     BIGINT NOT NULL,
+    PRIMARY KEY (auction_item_id, category_id),
+    FOREIGN KEY (auction_item_id) REFERENCES auction_items (id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS bids
 (                                           -- προσφορές
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
     auction_id     BIGINT         NOT NULL, -- η δημοπρασία για την οποία κάνει τη προσφορά

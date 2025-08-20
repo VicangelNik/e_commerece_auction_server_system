@@ -19,6 +19,8 @@ import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.AuctionItemEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.BidEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.AuctionRepository;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.helpers.AuctionEntityResultSetExtractor;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.helpers.AuctionItemEntityResultSetExtractor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
