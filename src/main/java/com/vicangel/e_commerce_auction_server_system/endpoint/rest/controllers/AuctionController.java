@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.AuctionService;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.AuctionOpenAPI;
@@ -91,10 +93,13 @@ final class AuctionController implements AuctionOpenAPI {
     return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }
 
-//
-//  @GetMapping(value = "/{id}/categories", produces = APPLICATION_JSON_VALUE)
-//  @Override
-//  private void getAuctionsByCategories() {
-//
-//  }
+  @DeleteMapping(value = "/{id}")
+  @Override
+  public ResponseEntity<Void> removeAuction(@PathVariable final long id) {
+    final boolean result = service.deleteAuction(id);
+    if (!result) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "auction is not deleted");
+    }
+    return ResponseEntity.status(HttpStatus.OK).build();
+  }
 }

@@ -29,4 +29,6 @@ public interface AuctionRepository {
    * @return Bid ID
    */
   long saveBid(BidEntity entity);
+
+  int deleteById(long id);
 }

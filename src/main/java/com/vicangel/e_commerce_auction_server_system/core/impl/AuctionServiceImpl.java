@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.AuctionService;
 import com.vicangel.e_commerce_auction_server_system.core.error.AuctionException;
+import com.vicangel.e_commerce_auction_server_system.core.error.AuctionIdNotFoundException;
 import com.vicangel.e_commerce_auction_server_system.core.error.UserException;
 import com.vicangel.e_commerce_auction_server_system.core.mappers.AuctionCoreMapper;
 import com.vicangel.e_commerce_auction_server_system.core.model.Auction;
@@ -80,5 +81,17 @@ final class AuctionServiceImpl implements AuctionService {
     }
 
     return id;
+  }
+
+  @Override
+  public boolean deleteAuction(final long id) {
+
+    if (this.findById(id, false).isEmpty()) {
+      throw new AuctionIdNotFoundException("Auction id not found to be deleted");
+    }
+
+    final int result = repository.deleteById(id);
+
+    return result == 1;
   }
 }

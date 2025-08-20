@@ -26,4 +26,6 @@ public interface AuctionService {
   List<Auction> findAll(boolean fetchItems);
 
   long bid(Bid bid);
+
+  boolean deleteAuction(long id);
 }

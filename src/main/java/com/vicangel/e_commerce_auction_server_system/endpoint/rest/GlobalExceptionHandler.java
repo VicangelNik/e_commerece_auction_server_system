@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.HandlerMethod;
 
+import com.vicangel.e_commerce_auction_server_system.core.error.AuctionIdNotFoundException;
 import com.vicangel.e_commerce_auction_server_system.core.error.ItemCategoryException;
 import com.vicangel.e_commerce_auction_server_system.core.error.RoleNotValidException;
 import com.vicangel.e_commerce_auction_server_system.core.error.UserException;
@@ -51,7 +52,8 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(value = {
     SQLIntegrityConstraintViolationException.class,
     RoleNotValidException.class,
-    UserIdNotFoundException.class})
+    UserIdNotFoundException.class,
+    AuctionIdNotFoundException.class})
   protected ResponseEntity<Object> handleRequestInputException(
     Exception ex) {
     log.error(ex.getMessage(), ex);

@@ -51,7 +51,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
            LEFT JOIN `auction-db`.categories ct ON ct.id = ic.category_id
        WHERE ai.auction_id = ?
     """;
-
+  private static final String DELETE_AUCTION_SQL = "DELETE FROM `auction-db`.auctions WHERE id = ?";
   private static final String findByIdClauseSQL = " WHERE ac.id = ?";
   private static final String insertBidSQL = "INSERT INTO bids (auction_id, bidder_id, time_submitted, amount) VALUES (?,?,?,?)";
   private final JdbcTemplate jdbcTemplate;
@@ -182,5 +182,10 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     if (keyHolder.getKey() == null) return ErrorCodes.SQL_ERROR.getCode();
 
     return keyHolder.getKey().longValue();
+  }
+
+  @Override
+  public int deleteById(final long id) {
+    return jdbcTemplate.update(DELETE_AUCTION_SQL, id);
   }
 }
