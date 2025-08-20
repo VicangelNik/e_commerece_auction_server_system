@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveOrUpdatedUserRequest;
@@ -46,7 +47,7 @@ public interface UserOpenAPI {
   })
   ResponseEntity<IdResponse> addUser(SaveOrUpdatedUserRequest request, MultipartFile avatar);
 
-  ResponseEntity<UserResponse> findById(@Valid @Positive long id, boolean fetchAvatar);
+  ResponseEntity<MultiValueMap<String, Object>> findById(@Valid @Positive long id, boolean fetchAvatar);
 
   ResponseEntity<List<UserResponse>> findAll(boolean fetchAvatar);
 

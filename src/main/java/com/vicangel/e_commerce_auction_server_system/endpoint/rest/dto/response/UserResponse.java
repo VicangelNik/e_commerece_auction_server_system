@@ -1,6 +1,9 @@
 package com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response;
 
 import java.time.Instant;
+import java.util.List;
+
+import lombok.With;
 
 public record UserResponse(Long id,
                            Instant created,
@@ -14,5 +17,7 @@ public record UserResponse(Long id,
                            Integer bidderRating,
                            Integer sellerRating,
                            String location,
-                           String country) {
+                           String country,
+                           List<String> roles,
+                           @With String avatar) {
 }
