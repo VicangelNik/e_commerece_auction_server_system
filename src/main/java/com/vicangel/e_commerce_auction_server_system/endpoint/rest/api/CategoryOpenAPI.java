@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveItemCategoryRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveCategoryRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.CategoryResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.ItemCategoryResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
@@ -15,11 +15,11 @@ import jakarta.validation.constraints.Positive;
  *   jakarta.validation.ConstraintDeclarationException: HV000151:
  *   A method overriding another method must not redefine the parameter constraint configuration
  */
-public interface ItemCategoryOpenAPI {
+public interface CategoryOpenAPI {
 
-  ResponseEntity<IdResponse> addCategory(@Valid SaveItemCategoryRequest request);
+  ResponseEntity<IdResponse> addCategory(@Valid SaveCategoryRequest request);
 
-  ResponseEntity<ItemCategoryResponse> findById(@Valid @Positive long id);
+  ResponseEntity<CategoryResponse> findById(@Valid @Positive long id);
 
-  ResponseEntity<List<ItemCategoryResponse>> findAll();
+  ResponseEntity<List<CategoryResponse>> findAll();
 }

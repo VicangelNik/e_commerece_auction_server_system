@@ -22,6 +22,7 @@ public interface UserEndpointMapper {
   @Mapping(target = "avatar", expression = "java( getEncodedImage(avatar) )")
   User mapRequestToModel(SaveOrUpdatedUserRequest request, MultipartFile avatar);
 
+  @Mapping(target = "withAvatar", ignore = true)
   UserResponse mapModelToResponse(User user);
 
   default String getEncodedImage(final MultipartFile avatar) {

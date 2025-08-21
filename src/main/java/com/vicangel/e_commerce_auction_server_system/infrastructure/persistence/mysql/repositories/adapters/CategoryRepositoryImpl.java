@@ -15,28 +15,28 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCodes;
-import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.ItemCategoryEntity;
-import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.CategoryItemRepository;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.CategoryEntity;
+import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class CategoryItemRepositoryImpl implements CategoryItemRepository {
+public class CategoryRepositoryImpl implements CategoryRepository {
 
-  private static final String findByIdSQL = "SELECT * FROM categories WHERE id = ?";
-  private static final String insertSQL = "INSERT INTO categories (name, description) VALUES (?,?)";
-  private static final String findAllSQL = "SELECT * FROM categories";
+  private static final String FIND_BY_ID_SQL = "SELECT * FROM categories WHERE id = ?";
+  private static final String INSERT_SQL = "INSERT INTO categories (name, description) VALUES (?,?)";
+  private static final String FIND_ALL_SQL = "SELECT * FROM categories";
   private final JdbcTemplate jdbcTemplate;
 
   @Override
-  public long insertCategory(@NonNull final ItemCategoryEntity entity) {
+  public long insertCategory(@NonNull final CategoryEntity entity) {
 
     final var keyHolder = new GeneratedKeyHolder();
 
     jdbcTemplate.update(connection -> {
-      PreparedStatement ps = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+      PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
       ps.setString(1, entity.name());
       ps.setString(2, entity.description());
       return ps;
@@ -48,11 +48,11 @@ public class CategoryItemRepositoryImpl implements CategoryItemRepository {
   }
 
   @Override
-  public Optional<ItemCategoryEntity> findById(final long id) {
+  public Optional<CategoryEntity> findById(final long id) {
     try {
       return Optional.ofNullable(jdbcTemplate.queryForObject(
-        findByIdSQL,
-        new ItemCategoryEntityRowMapper(),
+        FIND_BY_ID_SQL,
+        new CategoryEntityRowMapper(),
         id
       ));
     } catch (EmptyResultDataAccessException e) {
@@ -62,21 +62,21 @@ public class CategoryItemRepositoryImpl implements CategoryItemRepository {
   }
 
   @Override
-  public Stream<ItemCategoryEntity> findAll() {
-    return jdbcTemplate.queryForStream(findAllSQL, new ItemCategoryEntityRowMapper());
+  public Stream<CategoryEntity> findAll() {
+    return jdbcTemplate.queryForStream(FIND_ALL_SQL, new CategoryEntityRowMapper());
   }
 
-  private static final class ItemCategoryEntityRowMapper implements RowMapper<ItemCategoryEntity> {
+  private static final class CategoryEntityRowMapper implements RowMapper<CategoryEntity> {
 
     /**
      * @param rs     the {@code ResultSet} to map (pre-initialized for the current row)
      * @param rowNum the number of the current row
      **/
     @Override
-    public ItemCategoryEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-      return new ItemCategoryEntity(rs.getLong("id"),
-                                    rs.getString("name"),
-                                    rs.getString("description"));
+    public CategoryEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+      return new CategoryEntity(rs.getLong("id"),
+                                rs.getString("name"),
+                                rs.getString("description"));
     }
   }
 }

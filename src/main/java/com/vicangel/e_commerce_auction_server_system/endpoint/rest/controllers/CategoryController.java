@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vicangel.e_commerce_auction_server_system.core.api.ItemCategoryService;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.ItemCategoryOpenAPI;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveItemCategoryRequest;
+import com.vicangel.e_commerce_auction_server_system.core.api.CategoryService;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.CategoryOpenAPI;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveCategoryRequest;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.CategoryResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.ItemCategoryResponse;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers.ItemCategoryEndpointMapper;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.mappers.CategoryEndpointMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,25 +27,25 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/category")
 @RestController
 @Slf4j
-final class ItemCategoryController implements ItemCategoryOpenAPI {
+final class CategoryController implements CategoryOpenAPI {
 
-  private final ItemCategoryEndpointMapper mapper;
-  private final ItemCategoryService service;
+  private final CategoryEndpointMapper mapper;
+  private final CategoryService service;
 
   @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<IdResponse> addCategory(@RequestBody final SaveItemCategoryRequest request) {
+  public ResponseEntity<IdResponse> addCategory(@RequestBody final SaveCategoryRequest request) {
 
-    final long result = service.addCategoryItem(mapper.mapRequestToModel(request));
+    final long result = service.addCategory(mapper.mapRequestToModel(request));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }
 
   @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<ItemCategoryResponse> findById(@PathVariable final long id) {
+  public ResponseEntity<CategoryResponse> findById(@PathVariable final long id) {
 
-    Optional<ItemCategoryResponse> response = service.findById(id).map(mapper::mapModelToResponse);
+    Optional<CategoryResponse> response = service.findById(id).map(mapper::mapModelToResponse);
 
     return response.map(r -> ResponseEntity.status(HttpStatus.OK).body(r))
       .orElseGet(() -> ResponseEntity.notFound().build());
@@ -53,9 +53,9 @@ final class ItemCategoryController implements ItemCategoryOpenAPI {
 
   @GetMapping(value = "/all", produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<List<ItemCategoryResponse>> findAll() {
+  public ResponseEntity<List<CategoryResponse>> findAll() {
 
-    final List<ItemCategoryResponse> response = service.findAll().stream()
+    final List<CategoryResponse> response = service.findAll().stream()
       .map(mapper::mapModelToResponse)
       .toList();
 
