@@ -1,7 +1,6 @@
 use `auction-db`;
 
 # TRUNCATE TABLE user_roles;
-# TRUNCATE TABLE item_image;
 # TRUNCATE TABLE item_categories;
 # TRUNCATE TABLE auction_items;
 # TRUNCATE TABLE auctions;
@@ -11,7 +10,6 @@ use `auction-db`;
 # TRUNCATE TABLE categories;
 
 DROP TABLE IF EXISTS user_roles;
-DROP TABLE IF EXISTS item_image;
 DROP TABLE IF EXISTS item_categories;
 DROP TABLE IF EXISTS auction_items;
 DROP TABLE IF EXISTS bids;

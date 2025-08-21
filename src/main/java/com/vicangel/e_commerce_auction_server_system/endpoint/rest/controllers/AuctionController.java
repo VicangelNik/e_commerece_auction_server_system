@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.AuctionService;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.api.AuctionOpenAPI;
-import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.AuctionItemDTO;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.AuctionItemRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveAuctionRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveBidRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.AuctionResponse;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RequiredArgsConstructor
 @RequestMapping("/auction")
@@ -55,11 +58,12 @@ final class AuctionController implements AuctionOpenAPI {
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @PostMapping(value = "/item/add", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/item/add", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<IdResponse> addAuctionItem(@RequestBody final AuctionItemDTO request) {
+  public ResponseEntity<IdResponse> addAuctionItem(@RequestPart final AuctionItemRequest request,
+                                                   @RequestPart(value = "image", required = false) MultipartFile image) {
 
-    final long result = service.addAuctionItem(mapper.mapAuctionRequestToModel(request));
+    final long result = service.addAuctionItem(mapper.mapItemRequestToModel(request, image));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
   }

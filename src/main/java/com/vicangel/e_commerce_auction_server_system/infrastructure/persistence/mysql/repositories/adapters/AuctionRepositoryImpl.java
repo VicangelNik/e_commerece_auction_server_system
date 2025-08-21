@@ -3,6 +3,7 @@ package com.vicangel.e_commerce_auction_server_system.infrastructure.persistence
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -30,9 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AuctionRepositoryImpl implements AuctionRepository {
 
   private static final String INSERT_AUCTION_SQL = "INSERT INTO auctions (created, ends, first_bid, number_of_bids, seller_id, category_id) VALUES (?,?,?,?,?,?)";
-  private static final String insertAuctionItemSQL = "INSERT INTO auction_items (auction_id, name, description, location, latitude, longitude, country) VALUES (?,?,?,?,?,?,?)";
+  private static final String INSERT_AUCTION_ITEM_SQL = "INSERT INTO auction_items (auction_id, name, description, location, latitude, longitude, country, image) VALUES (?,?,?,?,?,?,?,?)";
   private static final String insertItemCategorySQL = "INSERT INTO item_categories(auction_item_id, category_id) VALUES (?,?)";
-  private static final String insertImageToItemSQL = "INSERT INTO item_image (item_id, name, description, type, image) VALUES (?,?,?,?,?)";
   private static final String FIND_ALL_SQL = """
        SELECT
            ac.id, ac.created, ac.started, ac.ends, ac.first_bid, ac.currently, ac.number_of_bids, ac.seller_id, ac.category_id,
@@ -42,11 +42,9 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     """;
   private static final String findItemByIdSQL = """
        SELECT
-           ai.id, ai.name, ai.description, ai.location, ai.latitude, ai.longitude, ai.country,
-           ct.id, ct.name, ct.description,
-           im.name, im.description, im.type, im.image
+           ai.id, ai.name, ai.description, ai.location, ai.latitude, ai.longitude, ai.country, ai.image,
+           ct.id, ct.name, ct.description
        FROM `auction-db`.auction_items ai
-           LEFT JOIN `auction-db`.item_image im ON im.item_id = ai.id
            LEFT JOIN `auction-db`.item_categories ic ON ic.auction_item_id = ai.id
            LEFT JOIN `auction-db`.categories ct ON ct.id = ic.category_id
        WHERE ai.auction_id = ?
@@ -92,7 +90,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     final var keyHolder = new GeneratedKeyHolder();
 
     jdbcTemplate.update(connection -> {
-      PreparedStatement ps = connection.prepareStatement(insertAuctionItemSQL, Statement.RETURN_GENERATED_KEYS);
+      PreparedStatement ps = connection.prepareStatement(INSERT_AUCTION_ITEM_SQL, Statement.RETURN_GENERATED_KEYS);
       ps.setLong(1, entity.auctionId());
       ps.setString(2, entity.name());
       ps.setString(3, entity.description());
@@ -100,6 +98,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
       ps.setDouble(5, entity.latitude());
       ps.setDouble(6, entity.longitude());
       ps.setString(7, entity.country());
+      ps.setObject(8, entity.image(), Types.BLOB);
       return ps;
     }, keyHolder);
 
@@ -114,17 +113,6 @@ public class AuctionRepositoryImpl implements AuctionRepository {
 
         if (categoryUpdateResult != 1) log.error("Category insert failed: {}", categoryUpdateResult);
       });
-
-    if (entity.image() != null) {
-      int imageUpdateResult = jdbcTemplate.update(insertImageToItemSQL,
-                                                  auctionItemID,
-                                                  entity.image().name(),
-                                                  entity.image().description(),
-                                                  entity.image().type(),
-                                                  entity.image().image());
-
-      if (imageUpdateResult != 1) log.error("Image insert failed: {}", imageUpdateResult);
-    }
 
     return auctionItemID;
   }

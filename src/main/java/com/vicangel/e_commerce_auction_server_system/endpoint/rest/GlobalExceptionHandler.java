@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.HandlerMethod;
 
+import com.vicangel.e_commerce_auction_server_system.core.error.AuctionException;
 import com.vicangel.e_commerce_auction_server_system.core.error.AuctionIdNotFoundException;
+import com.vicangel.e_commerce_auction_server_system.core.error.AuctionItemException;
 import com.vicangel.e_commerce_auction_server_system.core.error.ItemCategoryException;
 import com.vicangel.e_commerce_auction_server_system.core.error.RoleNotValidException;
 import com.vicangel.e_commerce_auction_server_system.core.error.UserException;
@@ -81,7 +83,11 @@ public class GlobalExceptionHandler {
     return buildResponseEntity(BAD_REQUEST, apiError);
   }
 
-  @ExceptionHandler(value = {UserException.class, ItemCategoryException.class})
+  @ExceptionHandler(value = {
+    UserException.class,
+    ItemCategoryException.class,
+    AuctionItemException.class,
+    AuctionException.class})
   protected ResponseEntity<Object> handleBusinessException(RuntimeException ex) {
     log.error(ex.getMessage(), ex);
     final var apiError = new ApiError(List.of(ex.getMessage()));

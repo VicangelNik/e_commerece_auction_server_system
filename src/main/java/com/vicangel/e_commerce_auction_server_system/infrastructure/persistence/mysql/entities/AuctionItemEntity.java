@@ -14,5 +14,5 @@ public record AuctionItemEntity(Long id,
                                 Double longitude,
                                 String country,
                                 Set<Long> categories,
-                                ItemImageEntity image) {
+                                String image) {
 }

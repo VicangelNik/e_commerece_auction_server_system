@@ -12,7 +12,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.AuctionItemEntity;
-import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.ItemImageEntity;
 
 @Component
 public class AuctionItemEntityResultSetExtractor implements ResultSetExtractor<List<AuctionItemEntity>> {
@@ -31,19 +30,6 @@ public class AuctionItemEntityResultSetExtractor implements ResultSetExtractor<L
         auctionItemEntityMap.put(itemID, entity);
       } else { // new auction item entry
 
-        final String imageName = rs.getString("im.name");  // image name can not be null if item has image
-        ItemImageEntity image = null;
-
-        if (imageName != null) {
-          image = new ItemImageEntity(
-            itemID,
-            imageName,
-            rs.getString("im.description"),
-            rs.getString("im.type"),
-            rs.getBytes("im.image")
-          );
-        }
-
         final var entity = AuctionItemEntity.builder()
           .id(itemID)
           .name(rs.getString("ai.name"))
@@ -53,7 +39,7 @@ public class AuctionItemEntityResultSetExtractor implements ResultSetExtractor<L
           .latitude(rs.getDouble("ai.longitude"))
           .country(rs.getString("ai.country"))
           .categories(new HashSet<>())
-          .image(image)
+          .image(rs.getString("ai.image"))
           .build();
 
         addCategoryToItem(rs, entity);

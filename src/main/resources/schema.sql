@@ -65,18 +65,8 @@ CREATE TABLE IF NOT EXISTS auction_items
     latitude    DECIMAL(10, 7),                    -- Προαιρετικά τα attributes Latitude και Longitude του στοιχείου Location ορίζουν τις γεωγραφικές συντεταγμένες του αντικειμένου.
     longitude   DECIMAL(10, 7),
     country     VARCHAR(3),                        -- 3-letter country codes stored
+    image       MEDIUMBLOB,
     FOREIGN KEY (auction_id) REFERENCES auctions (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS item_image
-(                                      -- one-to-one relationship
-    item_id     BIGINT       NOT NULL,
-    name        VARCHAR(255) NOT NULL, -- Μια σύντομη ονομασία που χρησιμοποιείται ως περιγραφή της δημοπρασίας
-    description VARCHAR(255),          -- Η πλήρης περιγραφή του αντικειμένου,
-    type        VARCHAR(4),            -- ο τύπος της εικόνας (JPEG, PNG etc)
-    image       BLOB,                  -- 65,535 bytes
-    PRIMARY KEY (item_id),
-    FOREIGN KEY (item_id) REFERENCES auction_items (id)
 );
 
 CREATE TABLE IF NOT EXISTS item_categories
