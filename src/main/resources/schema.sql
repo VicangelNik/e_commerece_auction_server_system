@@ -33,6 +33,13 @@ CREATE TABLE IF NOT EXISTS user_roles -- many-to-many relationship
     FOREIGN KEY (role_name) REFERENCES roles (name) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS categories
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS auctions
 (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY, -- Μοναδικό id της δημοπρασίας
@@ -43,7 +50,9 @@ CREATE TABLE IF NOT EXISTS auctions
     currently      DECIMAL(10, 2) NULL,               -- Η τρέχουσα καλύτερη προσφορά σε δολάρια. Είναι πάντοτε ίση με την υψηλότερη προσφορά ή με το First_Bid αν δεν έχουν υποβληθεί προσφορές
     number_of_bids INT            NOT NULL,           -- αριθμός των προσφορών / των στοιχείων προσφοράς, το οποίο ορίζεται από τον πωλητή πριν την έναρξη της δημοπρασίας
     seller_id      BIGINT         NOT NULL,           -- Ο πωλητής / δημιουργός της δημοπρασίας
-    FOREIGN KEY (seller_id) REFERENCES users (id)
+    category_id    BIGINT         NOT NULL,           -- Η Κατηγορία της δημοπρασίας
+    FOREIGN KEY (seller_id) REFERENCES users (id),
+    FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 
 CREATE TABLE IF NOT EXISTS auction_items
@@ -68,13 +77,6 @@ CREATE TABLE IF NOT EXISTS item_image
     image       BLOB,                  -- 65,535 bytes
     PRIMARY KEY (item_id),
     FOREIGN KEY (item_id) REFERENCES auction_items (id)
-);
-
-CREATE TABLE IF NOT EXISTS categories
-(
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name        VARCHAR(100) NOT NULL UNIQUE,
-    description VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS item_categories

@@ -14,6 +14,7 @@ public record Auction(Long id,
                       Float currently,
                       Integer numberOfBids,
                       Long sellerId,
+                      Long categoryId,
                       Set<AuctionItem> auctionItems,
                       Set<Bid> bids
 ) {

@@ -102,4 +102,19 @@ final class AuctionController implements AuctionOpenAPI {
     }
     return ResponseEntity.status(HttpStatus.OK).build();
   }
+
+  @GetMapping(value = "/all/category/{categoryId}", produces = APPLICATION_JSON_VALUE)
+  @Override
+  public ResponseEntity<List<AuctionResponse>> findByCategory(@PathVariable("categoryId") final long categoryId,
+                                                              @RequestParam final boolean fetchItems) {
+
+    List<AuctionResponse> response = service.fetchByCategory(categoryId, fetchItems)
+      .stream()
+      .map(mapper::mapModelToResponse)
+      .toList();
+
+    if (response.isEmpty()) return ResponseEntity.notFound().build();
+
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
 }

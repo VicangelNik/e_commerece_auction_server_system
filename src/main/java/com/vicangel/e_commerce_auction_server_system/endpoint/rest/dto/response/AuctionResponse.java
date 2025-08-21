@@ -14,6 +14,7 @@ public record AuctionResponse(Long id,
                               Float currently,
                               Integer numberOfBids,
                               Long sellerId,
+                              Long categoryId,
                               Set<AuctionItemDTO> auctionItems,
                               Set<BidDTO> bids) {
 }

@@ -94,4 +94,13 @@ final class AuctionServiceImpl implements AuctionService {
 
     return result == 1;
   }
+
+  @Override
+  public List<Auction> fetchByCategory(final long categoryId, final boolean fetchItems) {
+    return repository
+      .findPerCategory(categoryId, fetchItems)
+      .stream()
+      .map(mapper::mapEntityToModel)
+      .toList();
+  }
 }

@@ -28,4 +28,6 @@ public interface AuctionService {
   long bid(Bid bid);
 
   boolean deleteAuction(long id);
+
+  List<Auction> fetchByCategory(long categoryId, boolean fetchItems);
 }

@@ -29,16 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuctionRepositoryImpl implements AuctionRepository {
 
-  private static final String insertAuctionSQL = "INSERT INTO auctions (created, ends, first_bid, number_of_bids, seller_id) VALUES (?,?,?,?,?)";
+  private static final String INSERT_AUCTION_SQL = "INSERT INTO auctions (created, ends, first_bid, number_of_bids, seller_id, category_id) VALUES (?,?,?,?,?,?)";
   private static final String insertAuctionItemSQL = "INSERT INTO auction_items (auction_id, name, description, location, latitude, longitude, country) VALUES (?,?,?,?,?,?,?)";
   private static final String insertItemCategorySQL = "INSERT INTO item_categories(auction_item_id, category_id) VALUES (?,?)";
   private static final String insertImageToItemSQL = "INSERT INTO item_image (item_id, name, description, type, image) VALUES (?,?,?,?,?)";
-  private static final String findAllSQL = """
+  private static final String FIND_ALL_SQL = """
        SELECT
-           ac.id, ac.created, ac.started, ac.ends, ac.first_bid, ac.currently, ac.number_of_bids, ac.seller_id,
+           ac.id, ac.created, ac.started, ac.ends, ac.first_bid, ac.currently, ac.number_of_bids, ac.seller_id, ac.category_id,
            b.id, b.bidder_id, b.time_submitted, b.amount
        FROM `auction-db`.auctions ac
-                LEFT JOIN `auction-db`.bids b on ac.id = b.auction_id
+            LEFT JOIN `auction-db`.bids b on ac.id = b.auction_id
     """;
   private static final String findItemByIdSQL = """
        SELECT
@@ -52,6 +52,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
        WHERE ai.auction_id = ?
     """;
   private static final String DELETE_AUCTION_SQL = "DELETE FROM `auction-db`.auctions WHERE id = ?";
+  private static final String FIND_BY_CATEGORY_SQL = " WHERE ac.category_id = ?";
   private static final String findByIdClauseSQL = " WHERE ac.id = ?";
   private static final String insertBidSQL = "INSERT INTO bids (auction_id, bidder_id, time_submitted, amount) VALUES (?,?,?,?)";
   private final JdbcTemplate jdbcTemplate;
@@ -65,12 +66,13 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     final var keyHolder = new GeneratedKeyHolder();
 
     jdbcTemplate.update(connection -> {
-      PreparedStatement ps = connection.prepareStatement(insertAuctionSQL, Statement.RETURN_GENERATED_KEYS);
+      PreparedStatement ps = connection.prepareStatement(INSERT_AUCTION_SQL, Statement.RETURN_GENERATED_KEYS);
       ps.setTimestamp(1, Timestamp.from(entity.created()));
       ps.setTimestamp(2, Timestamp.from(entity.ends()));
       ps.setFloat(3, entity.firstBid());
       ps.setInt(4, entity.numberOfBids());
       ps.setLong(5, entity.sellerId());
+      ps.setLong(6, entity.categoryId());
       return ps;
     }, keyHolder);
 
@@ -130,7 +132,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   @Override
   public Optional<AuctionEntity> findById(final long id, final boolean fetchItems) {
     try {
-      final List<AuctionEntity> l = jdbcTemplate.query(findAllSQL + findByIdClauseSQL, extractor, id);
+      final List<AuctionEntity> l = jdbcTemplate.query(FIND_ALL_SQL + findByIdClauseSQL, extractor, id);
 
       if (l == null || l.isEmpty()) return Optional.empty();
 
@@ -150,19 +152,9 @@ public class AuctionRepositoryImpl implements AuctionRepository {
 
   @Override
   public List<AuctionEntity> findAll(final boolean fetchItems) {
-    List<AuctionEntity> l = jdbcTemplate.query(findAllSQL, extractor);
+    List<AuctionEntity> l = jdbcTemplate.query(FIND_ALL_SQL, extractor);
 
-    if (l == null) return Collections.emptyList();
-
-    if (fetchItems) {
-      l.forEach(entity -> {
-        final List<AuctionItemEntity> items = jdbcTemplate.query(findItemByIdSQL, extractorItem, entity.id());
-        if (items != null && !items.isEmpty()) {
-          entity.auctionItems().addAll(items);
-        }
-      });
-    }
-    return l;
+    return getAuctionEntities(fetchItems, l);
   }
 
   @Override
@@ -187,5 +179,27 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   @Override
   public int deleteById(final long id) {
     return jdbcTemplate.update(DELETE_AUCTION_SQL, id);
+  }
+
+  @Override
+  public List<AuctionEntity> findPerCategory(long categoryId, final boolean fetchItems) {
+    List<AuctionEntity> l = jdbcTemplate.query(FIND_ALL_SQL + FIND_BY_CATEGORY_SQL, extractor, categoryId);
+
+    return getAuctionEntities(fetchItems, l);
+  }
+
+  @NonNull
+  private List<AuctionEntity> getAuctionEntities(boolean fetchItems, List<AuctionEntity> l) {
+    if (l == null) return Collections.emptyList();
+
+    if (fetchItems) {
+      l.forEach(entity -> {
+        final List<AuctionItemEntity> items = jdbcTemplate.query(findItemByIdSQL, extractorItem, entity.id());
+        if (items != null && !items.isEmpty()) {
+          entity.auctionItems().addAll(items);
+        }
+      });
+    }
+    return l;
   }
 }

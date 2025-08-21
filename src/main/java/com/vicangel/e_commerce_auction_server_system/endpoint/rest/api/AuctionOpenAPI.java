@@ -27,4 +27,6 @@ public interface AuctionOpenAPI {
   ResponseEntity<IdResponse> addBid(@Valid SaveBidRequest request);
 
   ResponseEntity<Void> removeAuction(@Valid @Positive long id);
+
+  ResponseEntity<List<AuctionResponse>> findByCategory(@Valid @Positive long categoryId, boolean fetchItems);
 }

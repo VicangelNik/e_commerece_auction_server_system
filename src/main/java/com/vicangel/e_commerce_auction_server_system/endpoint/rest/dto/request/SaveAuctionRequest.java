@@ -13,7 +13,8 @@ import lombok.Builder;
 public record SaveAuctionRequest(@NotNull Instant ends,
                                  Float firstBid,
                                  @NotNull @Positive Integer numberOfBids,
-                                 @Positive Long sellerId,
+                                 @NotNull @Positive Long sellerId,
+                                 @NotNull @Positive Long categoryId,
                                  Set<AuctionItemDTO> auctionItems,
                                  Set<BidDTO> bids) {
 }

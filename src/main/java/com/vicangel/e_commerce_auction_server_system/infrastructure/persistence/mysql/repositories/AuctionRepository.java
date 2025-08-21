@@ -31,4 +31,6 @@ public interface AuctionRepository {
   long saveBid(BidEntity entity);
 
   int deleteById(long id);
+
+  List<AuctionEntity> findPerCategory(long categoryId, boolean fetchItems);
 }
