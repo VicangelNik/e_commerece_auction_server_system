@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-final class AuctionServiceImpl implements AuctionService {
+class AuctionServiceImpl implements AuctionService {
 
   private final AuctionCoreMapper mapper;
   private final AuctionRepository repository;

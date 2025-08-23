@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-final class UserServiceImpl implements UserService {
+class UserServiceImpl implements UserService {
 
   private final UserCoreMapper mapper;
   private final UserRepository repository;
