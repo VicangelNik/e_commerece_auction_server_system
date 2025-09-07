@@ -72,8 +72,25 @@ class AuctionServiceImpl implements AuctionService {
       .toList();
   }
 
+  /**
+   * Bid can only be made if the auction has started and the bid amount is greater than the current bid or the bid amount
+   * is greater or equal to the first bid.
+   */
   @Override
   public long bid(@NonNull final Bid bid) {
+
+    final var auction = this.findById(bid.auctionId(), false)
+      .orElseThrow(() -> new AuctionIdNotFoundException("Auction id not found to bid"));
+
+    if (auction.started() == null) throw new AuctionException("Auction has not started, cannot bid");
+    if (auction.currently() != null) {
+      if (bid.amount() < auction.currently()) throw new AuctionException("Bid amount must be greater than current bid");
+    } else {
+      if (bid.amount() <= auction.firstBid()) {
+        throw new AuctionException("Bid amount must be greater than or equal to first bid");
+      }
+    }
+
     final long id = repository.saveBid(mapper.mapBidModelToEntity(bid));
 
     if (id == ErrorCodes.SQL_ERROR.getCode()) {
@@ -83,12 +100,17 @@ class AuctionServiceImpl implements AuctionService {
     return id;
   }
 
+  /**
+   * Auction cannot be deleted if it has started or has bids.
+   */
   @Override
   public boolean deleteAuction(final long id) {
 
-    if (this.findById(id, false).isEmpty()) {
-      throw new AuctionIdNotFoundException("Auction id not found to be deleted");
-    }
+    final var auction = this.findById(id, false)
+      .orElseThrow(() -> new AuctionIdNotFoundException("Auction id not found to be deleted"));
+
+    if (auction.started() != null) throw new AuctionException("Auction has started, cannot be deleted");
+    if (!auction.bids().isEmpty()) throw new AuctionException("Auction has bids, cannot be deleted");
 
     final int result = repository.deleteById(id);
 
