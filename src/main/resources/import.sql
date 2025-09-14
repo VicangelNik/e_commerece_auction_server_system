@@ -36,11 +36,11 @@ VALUES (1, 'ADMIN'),
        (2, 'SELLER'),
        (3, 'BIDDER');
 
-INSERT INTO auctions (id, created, ends, first_bid, number_of_bids, seller_id, category_id)
-VALUES (1, NOW(), '2025-09-11T14:30:00', 100, 3, 1, 1),
-       (2, NOW(), '2025-09-12T14:30:00', 200, 3, 1, 2),
-       (3, NOW(), '2025-09-13T14:30:00', 30.65, 3, 1, 3),
-       (4, NOW(), '2025-09-14T14:30:00', 400, 3, 1, 4),
-       (5, NOW(), '2025-09-15T14:30:00', 10.5, 3, 1, 4),
-       (6, NOW(), '2025-09-16T14:30:00', 10.5, 3, 1, 5),
-       (7, NOW(), '2025-09-17T14:30:00', 10.5, 3, 1, 5);
+INSERT INTO auctions (id, title, created, end_date, first_bid, number_of_bids, seller_id, category_id)
+VALUES (1, 'auction 1', NOW(), '2025-09-11T14:30:00', 100, 3, 1, 1),
+       (2, 'auction 2', NOW(), '2025-09-12T14:30:00', 200, 3, 1, 2),
+       (3, 'auction 3', NOW(), '2025-09-13T14:30:00', 30.65, 3, 1, 3),
+       (4, 'auction 4', NOW(), '2025-09-14T14:30:00', 400, 3, 1, 4),
+       (5, 'auction 5', NOW(), '2025-09-15T14:30:00', 10.5, 3, 1, 4),
+       (6, 'auction 6', NOW(), '2025-09-16T14:30:00', 10.5, 3, 1, 5),
+       (7, 'auction 7', NOW(), '2025-09-17T14:30:00', 10.5, 3, 1, 5);

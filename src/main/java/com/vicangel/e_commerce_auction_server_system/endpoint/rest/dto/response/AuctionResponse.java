@@ -6,11 +6,12 @@ import java.util.Set;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.BidDTO;
 
 public record AuctionResponse(Long id,
+                              String title,
                               Instant created,
                               Instant started,
-                              Instant ends,
+                              Instant endDate,
                               Float firstBid,
-                              Float currently,
+                              Float currentBestBid,
                               Integer numberOfBids,
                               Long sellerId,
                               Long categoryId,

@@ -83,8 +83,10 @@ class AuctionServiceImpl implements AuctionService {
       .orElseThrow(() -> new AuctionIdNotFoundException("Auction id not found to bid"));
 
     if (auction.started() == null) throw new AuctionException("Auction has not started, cannot bid");
-    if (auction.currently() != null) {
-      if (bid.amount() < auction.currently()) throw new AuctionException("Bid amount must be greater than current bid");
+    if (auction.currentBestBid() != null) {
+      if (bid.amount() < auction.currentBestBid()) {
+        throw new AuctionException("Bid amount must be greater than current bid");
+      }
     } else {
       if (bid.amount() <= auction.firstBid()) {
         throw new AuctionException("Bid amount must be greater than or equal to first bid");

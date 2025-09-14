@@ -30,12 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuctionRepositoryImpl implements AuctionRepository {
 
-  private static final String INSERT_AUCTION_SQL = "INSERT INTO auctions (created, ends, first_bid, number_of_bids, seller_id, category_id) VALUES (?,?,?,?,?,?)";
+  private static final String INSERT_AUCTION_SQL = "INSERT INTO auctions (title, created, end_date, first_bid, number_of_bids, seller_id, category_id) VALUES (?,?,?,?,?,?,?)";
   private static final String INSERT_AUCTION_ITEM_SQL = "INSERT INTO auction_items (auction_id, name, description, location, latitude, longitude, country, image) VALUES (?,?,?,?,?,?,?,?)";
   private static final String insertItemCategorySQL = "INSERT INTO item_categories(auction_item_id, category_id) VALUES (?,?)";
   private static final String FIND_ALL_SQL = """
        SELECT
-           ac.id, ac.created, ac.started, ac.ends, ac.first_bid, ac.currently, ac.number_of_bids, ac.seller_id, ac.category_id,
+           ac.id, ac.title, ac.created, ac.started, ac.end_date, ac.first_bid, ac.current_best_bid, ac.number_of_bids, ac.seller_id, ac.category_id,
            b.id, b.bidder_id, b.time_submitted, b.amount
        FROM `auction-db`.auctions ac
             LEFT JOIN `auction-db`.bids b on ac.id = b.auction_id
@@ -65,12 +65,13 @@ public class AuctionRepositoryImpl implements AuctionRepository {
 
     jdbcTemplate.update(connection -> {
       PreparedStatement ps = connection.prepareStatement(INSERT_AUCTION_SQL, Statement.RETURN_GENERATED_KEYS);
-      ps.setTimestamp(1, Timestamp.from(entity.created()));
-      ps.setTimestamp(2, Timestamp.from(entity.ends()));
-      ps.setFloat(3, entity.firstBid());
-      ps.setInt(4, entity.numberOfBids());
-      ps.setLong(5, entity.sellerId());
-      ps.setLong(6, entity.categoryId());
+      ps.setString(1, entity.title());
+      ps.setTimestamp(2, Timestamp.from(entity.created()));
+      ps.setTimestamp(3, Timestamp.from(entity.endDate()));
+      ps.setFloat(4, entity.firstBid());
+      ps.setInt(5, entity.numberOfBids());
+      ps.setLong(6, entity.sellerId());
+      ps.setLong(7, entity.categoryId());
       return ps;
     }, keyHolder);
 

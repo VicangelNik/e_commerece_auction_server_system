@@ -23,7 +23,7 @@ public interface AuctionEndpointMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "created", ignore = true)
   @Mapping(target = "started", ignore = true)
-  @Mapping(target = "currently", ignore = true)
+  @Mapping(target = "currentBestBid", ignore = true)
   @Mapping(target = "auctionItems", ignore = true)
   @Mapping(target = "bids", ignore = true)
   Auction mapRequestToModel(SaveAuctionRequest request);

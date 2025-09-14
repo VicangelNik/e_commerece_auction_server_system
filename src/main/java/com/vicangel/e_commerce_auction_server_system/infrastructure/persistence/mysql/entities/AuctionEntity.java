@@ -7,11 +7,12 @@ import lombok.Builder;
 
 @Builder
 public record AuctionEntity(Long id,
+                            String title,
                             Instant created,
                             Instant started,
-                            Instant ends,
+                            Instant endDate,
                             Float firstBid,
-                            Float currently,
+                            Float currentBestBid,
                             Integer numberOfBids,
                             Long sellerId,
                             Long categoryId,
