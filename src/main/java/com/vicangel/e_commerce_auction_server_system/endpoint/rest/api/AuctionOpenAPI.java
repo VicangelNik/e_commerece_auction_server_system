@@ -10,6 +10,7 @@ import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.S
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.SaveBidRequest;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.AuctionResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
+import com.vicangel.e_commerce_auction_server_system.endpoint.rest.validation.ValidImageFile;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
@@ -19,7 +20,8 @@ public interface AuctionOpenAPI {
 
   ResponseEntity<Void> beginAuction(@Valid @Positive long auctionId);
 
-  ResponseEntity<IdResponse> addAuctionItem(@Valid AuctionItemRequest request, MultipartFile image);
+  ResponseEntity<IdResponse> addAuctionItem(@Valid AuctionItemRequest request,
+                                            @ValidImageFile MultipartFile image);
 
   ResponseEntity<AuctionResponse> findById(@Valid @Positive long id, boolean fetchItems);
 

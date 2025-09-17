@@ -58,15 +58,16 @@ CREATE TABLE IF NOT EXISTS auctions
 
 CREATE TABLE IF NOT EXISTS auction_items
 (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY, -- Μοναδικό id για το αντικείμενο που τίθεται σε δημοπρασία
-    auction_id  BIGINT,
-    name        VARCHAR(255) NOT NULL,             -- Μια σύντομη ονομασία που χρησιμοποιείται ως περιγραφή της δημοπρασίας
-    description TEXT,                              -- Η πλήρης περιγραφή του αντικειμένου
-    location    VARCHAR(100),                      -- Τα στοιχεία Location και Country εντός του item περιλαμβάνουν τις γεωγραφικές πληροφορίες του αντικειμένου.
-    latitude    DECIMAL(10, 7),                    -- Προαιρετικά τα attributes Latitude και Longitude του στοιχείου Location ορίζουν τις γεωγραφικές συντεταγμένες του αντικειμένου.
-    longitude   DECIMAL(10, 7),
-    country     VARCHAR(3),                        -- 3-letter country codes stored
-    image       MEDIUMBLOB,
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,                      -- Μοναδικό id για το αντικείμενο που τίθεται σε δημοπρασία
+    auction_id         BIGINT,
+    name               VARCHAR(255)                                  NOT NULL, -- Μια σύντομη ονομασία που χρησιμοποιείται ως περιγραφή της δημοπρασίας
+    description        TEXT,                                                   -- Η πλήρης περιγραφή του αντικειμένου
+    location           VARCHAR(100),                                           -- Τα στοιχεία Location και Country εντός του item περιλαμβάνουν τις γεωγραφικές πληροφορίες του αντικειμένου.
+    latitude           DECIMAL(10, 7),                                         -- Προαιρετικά τα attributes Latitude και Longitude του στοιχείου Location ορίζουν τις γεωγραφικές συντεταγμένες του αντικειμένου.
+    longitude          DECIMAL(10, 7),
+    country            VARCHAR(3),                                             -- 3-letter country codes stored
+    image              MEDIUMBLOB                                    NOT NULL,
+    image_content_type ENUM ('image/jpeg', 'image/png', 'image/jpg') NOT NULL,
     FOREIGN KEY (auction_id) REFERENCES auctions (id) ON DELETE CASCADE
 );
 

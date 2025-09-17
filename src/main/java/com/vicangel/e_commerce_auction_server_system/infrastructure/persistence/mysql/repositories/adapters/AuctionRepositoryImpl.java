@@ -31,8 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AuctionRepositoryImpl implements AuctionRepository {
 
   private static final String INSERT_AUCTION_SQL = "INSERT INTO auctions (title, created, end_date, first_bid, number_of_bids, seller_id, category_id) VALUES (?,?,?,?,?,?,?)";
-  private static final String INSERT_AUCTION_ITEM_SQL = "INSERT INTO auction_items (auction_id, name, description, location, latitude, longitude, country, image) VALUES (?,?,?,?,?,?,?,?)";
-  private static final String insertItemCategorySQL = "INSERT INTO item_categories(auction_item_id, category_id) VALUES (?,?)";
+  private static final String INSERT_AUCTION_ITEM_SQL = "INSERT INTO auction_items (auction_id, name, description, location, latitude, longitude, country, image, image_content_type) VALUES (?,?,?,?,?,?,?,?,?)";
+  private static final String INSERT_ITEM_CATEGORY_SQL = "INSERT INTO item_categories(auction_item_id, category_id) VALUES (?,?)";
   private static final String FIND_ALL_SQL = """
        SELECT
            ac.id, ac.title, ac.created, ac.started, ac.end_date, ac.first_bid, ac.current_best_bid, ac.number_of_bids, ac.seller_id, ac.category_id,
@@ -40,9 +40,9 @@ public class AuctionRepositoryImpl implements AuctionRepository {
        FROM `auction-db`.auctions ac
             LEFT JOIN `auction-db`.bids b on ac.id = b.auction_id
     """;
-  private static final String findItemByIdSQL = """
+  private static final String FIND_ITEMS_BY_AUCTION_ID_SQL = """
        SELECT
-           ai.id, ai.name, ai.description, ai.location, ai.latitude, ai.longitude, ai.country, ai.image,
+           ai.id, ai.name, ai.description, ai.location, ai.latitude, ai.longitude, ai.country, ai.image, ai.image_content_type,
            ct.id, ct.name, ct.description
        FROM `auction-db`.auction_items ai
            LEFT JOIN `auction-db`.item_categories ic ON ic.auction_item_id = ai.id
@@ -100,6 +100,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
       ps.setDouble(6, entity.longitude());
       ps.setString(7, entity.country());
       ps.setObject(8, entity.image(), Types.BLOB);
+      ps.setString(9, entity.imageContentType());
       return ps;
     }, keyHolder);
 
@@ -110,7 +111,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     entity.categories()
       .forEach(entityCategoryId -> {
 
-        int categoryUpdateResult = jdbcTemplate.update(insertItemCategorySQL, auctionItemID, entityCategoryId);
+        int categoryUpdateResult = jdbcTemplate.update(INSERT_ITEM_CATEGORY_SQL, auctionItemID, entityCategoryId);
 
         if (categoryUpdateResult != 1) log.error("Category insert failed: {}", categoryUpdateResult);
       });
@@ -128,7 +129,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
       final AuctionEntity entity = l.getFirst();
 
       if (fetchItems) {
-        final List<AuctionItemEntity> items = jdbcTemplate.query(findItemByIdSQL, extractorItem, id);
+        final List<AuctionItemEntity> items = jdbcTemplate.query(FIND_ITEMS_BY_AUCTION_ID_SQL, extractorItem, id);
         if (items != null && !items.isEmpty()) {
           entity.auctionItems().addAll(items);
         }
@@ -183,7 +184,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
 
     if (fetchItems) {
       l.forEach(entity -> {
-        final List<AuctionItemEntity> items = jdbcTemplate.query(findItemByIdSQL, extractorItem, entity.id());
+        final List<AuctionItemEntity> items = jdbcTemplate.query(FIND_ITEMS_BY_AUCTION_ID_SQL, extractorItem, entity.id());
         if (items != null && !items.isEmpty()) {
           entity.auctionItems().addAll(items);
         }

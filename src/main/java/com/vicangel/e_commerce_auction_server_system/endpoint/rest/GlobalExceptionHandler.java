@@ -2,7 +2,9 @@ package com.vicangel.e_commerce_auction_server_system.endpoint.rest;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.StreamSupport;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import com.vicangel.e_commerce_auction_server_system.core.error.AuctionException;
 import com.vicangel.e_commerce_auction_server_system.core.error.AuctionIdNotFoundException;
@@ -56,16 +59,33 @@ public class GlobalExceptionHandler {
     RoleNotValidException.class,
     UserIdNotFoundException.class,
     AuctionIdNotFoundException.class})
-  protected ResponseEntity<Object> handleRequestInputException(
-    Exception ex) {
+  protected ResponseEntity<Object> handleRequestInputException(Exception ex) {
     log.error(ex.getMessage(), ex);
     final var apiError = new ApiError(List.of(ex.getMessage()));
     return buildResponseEntity(BAD_REQUEST, apiError);
   }
 
+  @ExceptionHandler(value = HandlerMethodValidationException.class)
+  protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException ex) {
+    log.error(ex.getMessage(), ex);
+
+    Map<String, String> errors = new HashMap<>();
+
+    ex.getParameterValidationResults().forEach(result -> {
+      String parameterName = result.getMethodParameter().getParameterName();
+      result.getResolvableErrors().forEach(error -> {
+        if (!errors.containsKey(parameterName)) { //take the first error message for a given parameter
+          errors.put(parameterName, error.getDefaultMessage());
+        }
+      });
+    });
+    final var apiError = new ApiError(errors.values().stream().toList());
+    return buildResponseEntity(BAD_REQUEST, apiError);
+  }
+
   /**
    *
-   * @implNote if getConstraintViolations are not handled like this the message will be like -> updateUser.id: must be greater than 0
+   * @implNote if getConstraintViolations are not handled like this, the message will be like -> updateUser.id: must be greater than 0
    *   however, the desired result is -> id -> must be greater than 0
    */
   @ExceptionHandler(ConstraintViolationException.class)

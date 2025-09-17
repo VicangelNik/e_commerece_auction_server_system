@@ -33,6 +33,7 @@ public interface AuctionEndpointMapper {
 
   @Mapping(target = "image", expression = "java( getEncodedImage(image) )")
   @Mapping(target = "name", source = "request.name")
+  @Mapping(target = "imageContentType", source = "image.contentType")
   AuctionItem mapItemRequestToModel(AuctionItemRequest request, MultipartFile image);
 
   @Mapping(target = "id", ignore = true)
@@ -49,7 +50,7 @@ public interface AuctionEndpointMapper {
   }
 
   default byte[] getDecodedImage(final String image) {
-    if (image == null) return null;
+    if (image == null) return new byte[0];
     return Base64.getDecoder().decode(image);
   }
 }

@@ -61,8 +61,7 @@ final class AuctionController implements AuctionOpenAPI {
   @PostMapping(value = "/item/add", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<IdResponse> addAuctionItem(@RequestPart final AuctionItemRequest request,
-                                                   @RequestPart(value = "image", required = false) MultipartFile image) {
-
+                                                   @RequestPart(value = "image") final MultipartFile image) {
     final long result = service.addAuctionItem(mapper.mapItemRequestToModel(request, image));
 
     return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));

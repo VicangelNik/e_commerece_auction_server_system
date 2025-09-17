@@ -40,6 +40,7 @@ public class AuctionItemEntityResultSetExtractor implements ResultSetExtractor<L
           .country(rs.getString("ai.country"))
           .categories(new HashSet<>())
           .image(rs.getString("ai.image"))
+          .imageContentType(rs.getString("ai.image_content_type"))
           .build();
 
         addCategoryToItem(rs, entity);

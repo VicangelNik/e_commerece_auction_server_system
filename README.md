@@ -43,6 +43,9 @@ cd e_commerece_auction_server_system
 
 # Run backend
 ./gradlew bootRun
+
+# Run backend with reimport schema
+./gradlew bootRun --args='--data.refresh.start=true'
 ```
 
 App will start at:
