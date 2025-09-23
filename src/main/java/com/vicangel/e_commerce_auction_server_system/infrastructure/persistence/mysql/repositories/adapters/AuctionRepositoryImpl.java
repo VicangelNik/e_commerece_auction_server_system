@@ -52,7 +52,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
   private static final String DELETE_AUCTION_SQL = "DELETE FROM `auction-db`.auctions WHERE id = ?";
   private static final String FIND_BY_CATEGORY_SQL = " WHERE ac.category_id = ?";
   private static final String findByIdClauseSQL = " WHERE ac.id = ?";
-  private static final String insertBidSQL = "INSERT INTO bids (auction_id, bidder_id, time_submitted, amount) VALUES (?,?,?,?)";
+  private static final String INSERT_INTO_BID_SQL = "INSERT INTO bids (auction_id, bidder_id, time_submitted, amount) VALUES (?,?,?,?)";
   private final JdbcTemplate jdbcTemplate;
   private final AuctionEntityResultSetExtractor extractor;
   private final AuctionItemEntityResultSetExtractor extractorItem;
@@ -153,7 +153,7 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     final var keyHolder = new GeneratedKeyHolder();
 
     jdbcTemplate.update(connection -> {
-      PreparedStatement ps = connection.prepareStatement(insertBidSQL, Statement.RETURN_GENERATED_KEYS);
+      PreparedStatement ps = connection.prepareStatement(INSERT_INTO_BID_SQL, Statement.RETURN_GENERATED_KEYS);
       ps.setLong(1, entity.auctionId());
       ps.setLong(2, entity.bidderId());
       ps.setTimestamp(3, Timestamp.from(entity.bidSubmittedTime()));
@@ -162,6 +162,15 @@ public class AuctionRepositoryImpl implements AuctionRepository {
     }, keyHolder);
 
     if (keyHolder.getKey() == null) return ErrorCodes.SQL_ERROR.getCode();
+
+    int updateAuctionResult = this.jdbcTemplate.update("UPDATE auctions set current_best_bid = ? where id = ?",
+                                                       entity.amount(),
+                                                       entity.auctionId());
+
+    if (updateAuctionResult != 1) {
+      log.error("Update auction failed: {}", updateAuctionResult);
+      return ErrorCodes.SQL_ERROR.getCode();
+    }
 
     return keyHolder.getKey().longValue();
   }

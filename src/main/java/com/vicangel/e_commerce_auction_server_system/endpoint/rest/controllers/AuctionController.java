@@ -88,11 +88,12 @@ final class AuctionController implements AuctionOpenAPI {
 
   @PostMapping(value = "/bid/add", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
   @Override
-  public ResponseEntity<IdResponse> addBid(@RequestBody final SaveBidRequest request) {
+  public ResponseEntity<AuctionResponse> addBid(@RequestBody final SaveBidRequest request) {
 
-    final long result = service.bid(mapper.mapBidRequestToModel(request));
+    service.bid(mapper.mapBidRequestToModel(request));
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(new IdResponse(result));
+    return ResponseEntity.status(HttpStatus.CREATED)
+      .body(findById(request.auctionId(), true).getBody());
   }
 
   @DeleteMapping(value = "/{id}")

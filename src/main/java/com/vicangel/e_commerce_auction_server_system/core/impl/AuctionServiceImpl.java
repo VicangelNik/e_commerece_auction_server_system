@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.vicangel.e_commerce_auction_server_system.core.api.AuctionService;
 import com.vicangel.e_commerce_auction_server_system.core.error.AuctionException;
 import com.vicangel.e_commerce_auction_server_system.core.error.AuctionIdNotFoundException;
-import com.vicangel.e_commerce_auction_server_system.core.error.UserException;
 import com.vicangel.e_commerce_auction_server_system.core.mappers.AuctionCoreMapper;
 import com.vicangel.e_commerce_auction_server_system.core.model.Auction;
 import com.vicangel.e_commerce_auction_server_system.core.model.AuctionItem;
@@ -77,13 +76,13 @@ class AuctionServiceImpl implements AuctionService {
    * is greater or equal to the first bid.
    */
   @Override
-  public long bid(@NonNull final Bid bid) {
+  public void bid(@NonNull final Bid bid) {
 
     final var auction = this.findById(bid.auctionId(), false)
       .orElseThrow(() -> new AuctionIdNotFoundException("Auction id not found to bid"));
 
     if (auction.started() == null) throw new AuctionException("Auction has not started, cannot bid");
-    if (auction.currentBestBid() != null) {
+    if (auction.currentBestBid() != null && auction.currentBestBid() > 0) {
       if (bid.amount() < auction.currentBestBid()) {
         throw new AuctionException("Bid amount must be greater than current bid");
       }
@@ -96,10 +95,8 @@ class AuctionServiceImpl implements AuctionService {
     final long id = repository.saveBid(mapper.mapBidModelToEntity(bid));
 
     if (id == ErrorCodes.SQL_ERROR.getCode()) {
-      throw new UserException("Error occurred, inserting bid");
+      throw new AuctionException("Error occurred, inserting bid");
     }
-
-    return id;
   }
 
   /**
