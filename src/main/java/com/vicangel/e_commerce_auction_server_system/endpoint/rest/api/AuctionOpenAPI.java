@@ -18,7 +18,7 @@ public interface AuctionOpenAPI {
 
   ResponseEntity<IdResponse> createAuction(@Valid SaveAuctionRequest request);
 
-  ResponseEntity<Void> beginAuction(@Valid @Positive long auctionId);
+  ResponseEntity<AuctionResponse> beginAuction(@Valid @Positive long auctionId);
 
   ResponseEntity<IdResponse> addAuctionItem(@Valid AuctionItemRequest request,
                                             @ValidImageFile MultipartFile image);

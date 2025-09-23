@@ -51,11 +51,10 @@ final class AuctionController implements AuctionOpenAPI {
 
   @PatchMapping(value = "/{id}/begin")
   @Override
-  public ResponseEntity<Void> beginAuction(@PathVariable("id") final long auctionId) {
-
+  public ResponseEntity<AuctionResponse> beginAuction(@PathVariable("id") final long auctionId) {
     service.beginAuction(auctionId);
 
-    return ResponseEntity.status(HttpStatus.OK).build();
+    return findById(auctionId, true);
   }
 
   @PostMapping(value = "/item/add", consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
