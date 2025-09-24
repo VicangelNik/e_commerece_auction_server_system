@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS auctions
     end_date         DATETIME       NOT NULL,           -- Χρόνος λήξης της δημοπρασίας
     first_bid        DECIMAL(10, 2) NOT NULL,           -- το ελάχιστο μέγεθος της πρώτης προσφοράς, το οποίο ορίζεται από τον πωλητή πριν την έναρξη της δημοπρασίας
     current_best_bid DECIMAL(10, 2) NULL,               -- Η τρέχουσα καλύτερη προσφορά σε δολάρια. Είναι πάντοτε ίση με την υψηλότερη προσφορά ή με το First_Bid αν δεν έχουν υποβληθεί προσφορές
-    number_of_bids   INT            NOT NULL,           -- αριθμός των προσφορών / των στοιχείων προσφοράς, το οποίο ορίζεται από τον πωλητή πριν την έναρξη της δημοπρασίας
     seller_id        BIGINT         NOT NULL,           -- Ο πωλητής / δημιουργός της δημοπρασίας
     category_id      BIGINT         NOT NULL,           -- Η Κατηγορία της δημοπρασίας
     FOREIGN KEY (seller_id) REFERENCES users (id),

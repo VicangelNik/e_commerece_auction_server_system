@@ -23,11 +23,10 @@ final class AuctionEndpointMapperTest {
 
     final Instant ends = Instant.now();
 
-    final Auction expected = Auction.builder().endDate(ends).firstBid(7.00F).numberOfBids(3).sellerId(1L).build();
+    final Auction expected = Auction.builder().endDate(ends).firstBid(7.00F).sellerId(1L).build();
 
     final Auction actual = mapper.mapRequestToModel(SaveAuctionRequest.builder().endDate(ends)
                                                       .firstBid(7.00F)
-                                                      .numberOfBids(3)
                                                       .sellerId(1L)
                                                       .build());
     Assertions.assertThat(actual).isEqualTo(expected);

@@ -11,7 +11,6 @@ import lombok.Builder;
 public record SaveAuctionRequest(@NotNull Instant endDate,
                                  @NotBlank String title,
                                  @NotNull @Positive Float firstBid,
-                                 @NotNull @Positive Integer numberOfBids,
                                  @NotNull @Positive Long sellerId,
                                  @NotNull @Positive Long categoryId) {
 }

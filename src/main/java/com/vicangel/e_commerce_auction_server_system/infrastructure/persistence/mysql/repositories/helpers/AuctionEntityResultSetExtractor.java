@@ -41,7 +41,6 @@ public final class AuctionEntityResultSetExtractor implements ResultSetExtractor
           .endDate(toInstant(rs, "ac.end_date"))
           .firstBid(rs.getFloat("ac.first_bid"))
           .currentBestBid(rs.getFloat("ac.current_best_bid"))
-          .numberOfBids(rs.getInt("ac.number_of_bids"))
           .sellerId(rs.getLong("ac.seller_id"))
           .auctionItems(new HashSet<>())
           .bids(new HashSet<>())
