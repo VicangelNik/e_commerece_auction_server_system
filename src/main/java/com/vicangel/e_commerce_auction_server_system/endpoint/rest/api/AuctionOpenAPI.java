@@ -11,9 +11,11 @@ import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.request.S
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.AuctionResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.dto.response.IdResponse;
 import com.vicangel.e_commerce_auction_server_system.endpoint.rest.validation.ValidImageFile;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
+@Tag(name = "Auction", description = "Api to accept requests regarding auction operations")
 public interface AuctionOpenAPI {
 
   ResponseEntity<IdResponse> createAuction(@Valid SaveAuctionRequest request);

@@ -53,6 +53,11 @@ App will start at:
 http://localhost:8080
 ```
 
+Application's Swagger:
+```
+http://localhost:8080/swagger-ui/index.html#/
+```
+
 ---
 
 ## API Endpoints (short overview)

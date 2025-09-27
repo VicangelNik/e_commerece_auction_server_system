@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import io.jsonwebtoken.Jwts;
 
-final class SecurityConfigTest {
+final class WebSecurityConfigTest {
 
   @Test
   void generateSecretKey() {
