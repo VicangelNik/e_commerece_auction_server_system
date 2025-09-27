@@ -45,7 +45,6 @@ public final class UserEntityResultSetExtractor implements ResultSetExtractor<Li
         final var entity = UserEntity.builder()
           .id(userID)
           .created(toInstant(rs, "u.created"))
-          .username(rs.getString("u.username"))
           .password(rs.getString("u.password"))
           .name(rs.getString("u.name"))
           .surname(rs.getString("u.surname"))
@@ -58,6 +57,8 @@ public final class UserEntityResultSetExtractor implements ResultSetExtractor<Li
           .country(rs.getString("u.country"))
           .roles(new HashSet<>())
           .avatar(avatar)
+          .accountLocked(rs.getBoolean("u.account_locked"))
+          .enabled(rs.getBoolean("enabled"))
           .build();
 
         addRoleToUser(rs, entity);

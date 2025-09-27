@@ -2,20 +2,21 @@ use `auction-db`;
 
 CREATE TABLE IF NOT EXISTS users
 (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    created       DATETIME NOT NULL, -- Ημερομηνία δημιουργίας εγγραφής (συστημικό)
-    username      VARCHAR(100),
-    password      VARCHAR(100),
-    name          VARCHAR(100),
-    surname       VARCHAR(100),
-    email         VARCHAR(100),
-    phone         VARCHAR(15),       -- τηλέφωνο επικοινωνίας
-    afm           VARCHAR(9),        -- αριθμός φορολογικού μητρώου
-    bidder_rating INT,               -- το rating του χρήστη ως bidder
-    seller_rating INT,               -- το rating του χρήστη ως seller
-    location      VARCHAR(100),
-    country       VARCHAR(3),        -- 3-letter country codes stored
-    avatar        MEDIUMBLOB         -- https://www.dbvis.com/thetable/blob-data-type-everything-you-can-do-with-it/#:~:text=BLOB%20%3A%20Can%20store%20up%20to,to%204%2C294%2C967%2C295%20bytes%20of%20data.
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    created        DATETIME     NOT NULL, -- Ημερομηνία δημιουργίας εγγραφής (συστημικό)
+    password       VARCHAR(100) NOT NULL,
+    name           VARCHAR(100) NOT NULL,
+    surname        VARCHAR(100) NOT NULL,
+    email          VARCHAR(100) NOT NULL,
+    phone          VARCHAR(15),           -- τηλέφωνο επικοινωνίας
+    afm            VARCHAR(9),            -- αριθμός φορολογικού μητρώου
+    bidder_rating  INT,                   -- το rating του χρήστη ως bidder
+    seller_rating  INT,                   -- το rating του χρήστη ως seller
+    location       VARCHAR(100),
+    country        VARCHAR(3),            -- 3-letter country codes stored
+    avatar         MEDIUMBLOB,            -- https://www.dbvis.com/thetable/blob-data-type-everything-you-can-do-with-it/#:~:text=BLOB%20%3A%20Can%20store%20up%20to,to%204%2C294%2C967%2C295%20bytes%20of%20data.
+    account_locked BOOLEAN      NOT NULL,
+    enabled        BOOLEAN      NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS roles

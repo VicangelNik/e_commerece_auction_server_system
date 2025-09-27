@@ -3,11 +3,12 @@ package com.vicangel.e_commerce_auction_server_system.core.api;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vicangel.e_commerce_auction_server_system.core.model.User;
 
-public interface UserService {
+public interface UserService extends UserDetailsService {
 
   @Transactional
   long insertUser(User user);

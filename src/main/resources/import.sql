@@ -19,28 +19,28 @@ VALUES (1, 'Electronics',
         'Bid on fine art, rare antiques, pop culture memorabilia, and unique items for the passionate collector.');
 
 -- Mysql LOAD_FILE function does not work
-INSERT INTO users (id, created, username, password, name, surname, email, phone, afm, bidder_rating, seller_rating,
-                   location, country, avatar)
-VALUES (1, now(), 'admin', 'pass', 'Administrator', 'System',
+INSERT INTO users (id, created, password, name, surname, email, phone, afm, bidder_rating, seller_rating,
+                   location, country, avatar, account_locked, enabled)
+VALUES (1, now(), 'pass', 'Administrator', 'System',
         'admin@gmail.com', '1111111111', '222222222', null, null,
-        'New York', 'USA', LOAD_FILE('admin_avatar.png')),
-       (2, now(), 'seller', 'pass', 'Seller', 'Seller Junior',
+        'New York', 'USA', LOAD_FILE('admin_avatar.png'), false, true),
+       (2, now(), 'pass', 'Seller', 'Seller Junior',
         'seller@gmail.com', '1111111111', '222222222', null, 7,
-        'Athens', 'GRE', LOAD_FILE('seller_avatar.png')),
-       (3, now(), 'bidder', 'pass', 'Bidder', 'Bidder Junior',
+        'Athens', 'GRE', LOAD_FILE('seller_avatar.png'), false, true),
+       (3, now(), 'pass', 'Bidder', 'Bidder Junior',
         'bidder@gmail.com', '1111111111', '222222222', 5, null,
-        'Cairo', 'EGY', LOAD_FILE('bidder_avatar.png'));
+        'Cairo', 'EGY', LOAD_FILE('bidder_avatar.png'), false, true);
 
 INSERT INTO user_roles (user_id, role_name)
 VALUES (1, 'ADMIN'),
        (2, 'SELLER'),
        (3, 'BIDDER');
 
-INSERT INTO auctions (id, title, created, end_date, first_bid, number_of_bids, seller_id, category_id)
-VALUES (1, 'auction 1', NOW(), '2025-09-11T14:30:00', 100, 3, 1, 1),
-       (2, 'auction 2', NOW(), '2025-09-12T14:30:00', 200, 3, 1, 2),
-       (3, 'auction 3', NOW(), '2025-09-13T14:30:00', 30.65, 3, 1, 3),
-       (4, 'auction 4', NOW(), '2025-09-14T14:30:00', 400, 3, 1, 4),
-       (5, 'auction 5', NOW(), '2025-09-15T14:30:00', 10.5, 3, 1, 4),
-       (6, 'auction 6', NOW(), '2025-09-16T14:30:00', 10.5, 3, 1, 5),
-       (7, 'auction 7', NOW(), '2025-09-17T14:30:00', 10.5, 3, 1, 5);
+INSERT INTO auctions (id, title, created, end_date, first_bid, seller_id, category_id)
+VALUES (1, 'auction 1', NOW(), '2025-09-11T14:30:00', 100, 1, 1),
+       (2, 'auction 2', NOW(), '2025-09-12T14:30:00', 200, 1, 2),
+       (3, 'auction 3', NOW(), '2025-09-13T14:30:00', 30.65, 1, 3),
+       (4, 'auction 4', NOW(), '2025-09-14T14:30:00', 400, 1, 4),
+       (5, 'auction 5', NOW(), '2025-09-15T14:30:00', 10.5, 1, 4),
+       (6, 'auction 6', NOW(), '2025-09-16T14:30:00', 10.5, 1, 5),
+       (7, 'auction 7', NOW(), '2025-09-17T14:30:00', 10.5, 1, 5);

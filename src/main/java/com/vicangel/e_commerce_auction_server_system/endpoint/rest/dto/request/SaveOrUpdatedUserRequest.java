@@ -9,8 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 
-public record SaveOrUpdatedUserRequest(@NotBlank(groups = SaveUser.class) String username,
-                                       @NotBlank(groups = SaveUser.class) String password,
+public record SaveOrUpdatedUserRequest(@NotBlank(groups = SaveUser.class) String password,
                                        @NotBlank(groups = SaveUser.class) String name,
                                        @NotBlank(groups = SaveUser.class) String surname,
                                        @Email(groups = {SaveUser.class, UpdateUser.class}) String email,

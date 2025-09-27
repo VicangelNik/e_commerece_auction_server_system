@@ -8,7 +8,6 @@ import lombok.Builder;
 @Builder
 public record UserEntity(Long id,
                          Instant created,
-                         String username,
                          String password,
                          String name,
                          String surname,
@@ -20,5 +19,7 @@ public record UserEntity(Long id,
                          String location,
                          String country,
                          Set<String> roles,
-                         String avatar) {
+                         String avatar,
+                         boolean accountLocked,
+                         boolean enabled) {
 }

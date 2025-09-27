@@ -12,7 +12,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import com.vicangel.e_commerce_auction_server_system.core.error.RoleNotValidException;
@@ -20,6 +19,7 @@ import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCod
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.entities.UserEntity;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.UserRepository;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.helpers.UserEntityResultSetExtractor;
+import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,14 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserRepositoryImpl implements UserRepository {
 
-  private static final String insertSQL = """
-    INSERT INTO `auction-db`.users (created, username, password, name, surname, email, phone, afm, bidder_rating,
-                                    seller_rating, location, country, avatar) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+  private static final String INSERT_SQL = """
+    INSERT INTO `auction-db`.users (created, password, name, surname, email, phone, afm, bidder_rating,
+                                    seller_rating, location, country, avatar, account_locked, enabled) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """;
   private static final String FIND_ALL_SQL = """
     SELECT u.id,
            u.created,
-           u.username,
            u.password,
            u.name,
            u.surname,
@@ -47,6 +46,8 @@ public class UserRepositoryImpl implements UserRepository {
            u.location,
            u.country,
            u.avatar,
+           u.account_locked,
+           u.enabled,
            r.name
     FROM `auction-db`.users u
              INNER JOIN `auction-db`.user_roles ur ON ur.user_id = u.id
@@ -54,9 +55,8 @@ public class UserRepositoryImpl implements UserRepository {
     """;
   private static final String UPDATE_SQL = """
     UPDATE `auction-db`.users
-    SET username = ?, password = ?, name = ?, surname = ?, email = ?, phone = ?,
-        afm = ?, bidder_rating = ?, seller_rating = ?, location = ?, country = ?,
-        avatar = ?
+    SET password = ?, name = ?, surname = ?, email = ?, phone = ?, afm = ?, bidder_rating = ?, seller_rating = ?,
+        location = ?, country = ?, avatar = ?, accountLocked = ?, enabled = ?
     WHERE id = ?;
     """;
   private static final String ADD_USER_ROLE_SQL = "INSERT INTO user_roles (user_id, role_name) VALUES (?, ?)";
@@ -66,25 +66,26 @@ public class UserRepositoryImpl implements UserRepository {
   private final UserEntityResultSetExtractor extractor;
 
   @Override
-  public long insertUser(@NonNull final UserEntity entity) {
+  public long insertUser(@Nonnull final UserEntity entity) {
 
     final var keyHolder = new GeneratedKeyHolder();
 
     jdbcTemplate.update(connection -> {
-      PreparedStatement ps = connection.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
+      PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
       ps.setTimestamp(1, Timestamp.from(entity.created()));
-      ps.setString(2, entity.username());
-      ps.setString(3, entity.password());
-      ps.setString(4, entity.name());
-      ps.setString(5, entity.surname());
-      ps.setString(6, entity.email());
-      ps.setObject(7, entity.phone(), Types.VARCHAR); // might be null, hence, this differentiation.
-      ps.setObject(8, entity.afm(), Types.VARCHAR);
-      ps.setObject(9, entity.bidderRating(), Types.INTEGER);
-      ps.setObject(10, entity.sellerRating(), Types.INTEGER);
-      ps.setObject(11, entity.location(), Types.VARCHAR);
-      ps.setObject(12, entity.country(), Types.VARCHAR);
-      ps.setObject(13, entity.avatar(), Types.BLOB);
+      ps.setString(2, entity.password());
+      ps.setString(3, entity.name());
+      ps.setString(4, entity.surname());
+      ps.setString(5, entity.email());
+      ps.setObject(6, entity.phone(), Types.VARCHAR); // might be null, hence, this differentiation.
+      ps.setObject(7, entity.afm(), Types.VARCHAR);
+      ps.setObject(8, entity.bidderRating(), Types.INTEGER);
+      ps.setObject(9, entity.sellerRating(), Types.INTEGER);
+      ps.setObject(10, entity.location(), Types.VARCHAR);
+      ps.setObject(11, entity.country(), Types.VARCHAR);
+      ps.setObject(12, entity.avatar(), Types.BLOB);
+      ps.setBoolean(13, entity.accountLocked());
+      ps.setBoolean(14, entity.enabled());
       return ps;
     }, keyHolder);
 
@@ -95,7 +96,7 @@ public class UserRepositoryImpl implements UserRepository {
     entity.roles()
       .forEach(roleId -> {
 
-        int addUserRoleResult = jdbcTemplate.update(ADD_USER_ROLE_SQL, userId, roleId);
+        final int addUserRoleResult = jdbcTemplate.update(ADD_USER_ROLE_SQL, userId, roleId);
 
         if (addUserRoleResult != 1) log.error("Role {} could not be added to User {}", roleId, userId);
       });
@@ -137,14 +138,12 @@ public class UserRepositoryImpl implements UserRepository {
       try {
         int addUserRoleResult = jdbcTemplate.update(ADD_USER_ROLE_SQL, userToUpdate.id(), roleId);
         if (addUserRoleResult != 1) log.error("Role {} could not be added to User {}", roleId, userToUpdate.id());
-      }catch (DataIntegrityViolationException e)
-      {
+      } catch (DataIntegrityViolationException e) {
         throw new RoleNotValidException("Role to be added for user does not exist", e);
       }
     });
 
     return jdbcTemplate.update(UPDATE_SQL,
-                               userToUpdate.username(),
                                userToUpdate.password(),
                                userToUpdate.name(),
                                userToUpdate.surname(),
@@ -156,6 +155,27 @@ public class UserRepositoryImpl implements UserRepository {
                                userToUpdate.location(),
                                userToUpdate.country(),
                                userToUpdate.avatar(),
+                               userToUpdate.accountLocked(),
+                               userToUpdate.enabled(),
                                userToUpdate.id());
+  }
+
+  @Override
+  public Optional<UserEntity> findByEmail(@Nonnull final String email, final boolean fetchAvatar) {
+
+    String sql = FIND_ALL_SQL + " WHERE email = ?";
+    if (!fetchAvatar) {
+      sql = sql.replace("u.avatar,", ""); // exclude fetching image
+    }
+
+    final List<UserEntity> l = jdbcTemplate.query(sql, extractor, email);
+
+    if (l == null || l.isEmpty()) return Optional.empty();
+    try {
+      return Optional.of(l.getFirst());
+    } catch (EmptyResultDataAccessException e) {
+      log.error(e.getMessage(), e);
+      return Optional.empty();
+    }
   }
 }

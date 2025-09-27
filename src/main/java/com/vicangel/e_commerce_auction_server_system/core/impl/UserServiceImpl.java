@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.vicangel.e_commerce_auction_server_system.core.api.UserService;
@@ -14,6 +16,7 @@ import com.vicangel.e_commerce_auction_server_system.core.mappers.UserCoreMapper
 import com.vicangel.e_commerce_auction_server_system.core.model.User;
 import com.vicangel.e_commerce_auction_server_system.core.model.commons.ErrorCodes;
 import com.vicangel.e_commerce_auction_server_system.infrastructure.persistence.mysql.repositories.UserRepository;
+import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,7 +62,6 @@ class UserServiceImpl implements UserService {
       .map(mapper::mapEntityToModel)
       .map(existingUser -> User.builder().id(existingUser.id())
         .created(existingUser.created())
-        .username(updatedUser.username() != null ? updatedUser.username() : existingUser.username())
         .password(updatedUser.password() != null ? updatedUser.password() : existingUser.password())
         .name(updatedUser.name() != null ? updatedUser.name() : existingUser.name())
         .surname(updatedUser.surname() != null ? updatedUser.surname() : existingUser.surname())
@@ -90,5 +92,12 @@ class UserServiceImpl implements UserService {
     rolesNew.removeAll(rolesExisting);
 
     return rolesNew;
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(@Nonnull final String username) throws UsernameNotFoundException {
+    return repository.findByEmail(username, false)
+      .map(mapper::mapEntityToModel)
+      .orElseThrow(() -> new UsernameNotFoundException("User not found"));
   }
 }
